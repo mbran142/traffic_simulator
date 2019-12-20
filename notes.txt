@@ -1,0 +1,61 @@
+vehicle.cpp
+
+    Vehicle class
+        - bool checkStraightSignal()
+        - bool checkTurnSignal()
+        - bool checkRightPedestrians()
+        - void accelerate(bool) // true => accelerate to max speed, false => decelerate to stop
+
+        TODO LATER
+        - abstract void signalToChangeLane(int leftOrRight)
+        - abstract void changeLane(int leftOrRight)
+
+signal.cpp
+
+    TrafficSignal class
+        public:
+        - bool isGreen()
+        - bool isYellow()
+        - bool isRed()
+        private:
+        - int status //color of the light
+        - int timeLeft //time left on this color. -1 means that the next turn is undetermined
+        - void cycleToNext()
+
+    TrafficSystem class
+        - Uses a 2d array of traffic signals to simulate a 4-way intersection's signal system:
+            TrafficSignal signals[4][3];
+
+road.cpp
+
+    Grid class
+        - A full array of boolean values that represents the road
+
+    Lane class
+        - Spawn and despawn points for vehicles exist within lanes
+        - Individual lanes
+            + This simulation will use a static 3 lanes
+                > Leftmost for turning only
+                > Middle for going straight
+                > Rightmost for going straight or turning right
+        - Lanes will be represented an array of 1x1 spaces on the Grid
+            + Spawn points (likely will have a queue of to-spawn vehicles if overflow)
+            + Intersection endpoints and intersection startpoints
+                > Depending on if a vehicle will want to go straight or turn, there will be a set path that vehicles take
+
+    Road class
+
+    Crossroad class
+
+intersection.cpp
+
+    - Contains a grid, crossroad, and signalsystem
+
+traffic.cpp
+
+    - Acts as the drivers for the program
+    - Instantiate one intersection class and do a run()
+        + Different constructors can be used to simulate different scenarios
+            > e.g., change lane car spawn rate
+            > e.g., change rate in which cars want to go to specific roads
+    - runSimulation(int ticks)

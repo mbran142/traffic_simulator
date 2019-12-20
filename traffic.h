@@ -18,6 +18,7 @@ const int car_rate = 91,
 const int right_turn_rate = 40;
 
 //road.h
+enum color { GREEN, YELLOW, RED };
 
 //lanes
 #define LANE_SIZE 26
