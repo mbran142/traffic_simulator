@@ -13,9 +13,29 @@ bool Grid::isOpen(int i, int j) {
 }
 
 
-//
-Lane::Lane(int dir, Gridpoint startpoint, Gridpoint endpoint, bool spawnpoint) : DIRECTION(dir) {
-    //create a lane using this stuff
+//Creates a lane on a road
+Lane::Lane(int dir, Gridpoint startpoint, Gridpoint endpoint, bool b) : SPAWNER(b), DIRECTION(dir) {
+    
+    //TODO: SPLIT THIS UP INTO SPAWNLANE AND ENDLANES ***REMEMBER THAT THE KILL TILES FOR A KILL LANE SHOULD = MAX SPEED
+    //decide where the special point is
+    if (SPAWNER) {
+
+        int x, y;
+
+        if (startpoint.x == endpoint.x) {
+            x = startpoint.x;
+            y = startpoint.y > endpoint.y ? startpoint.y + T_SIZE : startpoint.y - T_SIZE;
+        }
+        else {
+            y = startpoint.y;
+            x = startpoint.x + (startpoint.x > endpoint.y ? T_SIZE : T_SIZE * -1);
+        }
+
+        specialPoint.x = x;
+        specialPoint.y = y;
+    }
+
+    else specialPoint = endpoint;
 }
 
 //
@@ -30,13 +50,7 @@ int Lane::backSpacesOpen() const {
     return 0;
 }
 
-//
-Gridpoint Lane::getSpawnPoint() const {
-    //return the spawn point of this lane (NOT THE START; THE SPAWN)
-    return Gridpoint(0,0);
-}
-
-//
+//Gets the direction the lane is going
 int Lane::getDirection() const {
     return DIRECTION;
 }
@@ -58,4 +72,18 @@ Road::~Road() {
 }
 
 
-//IMPLEMENT CROSSROAD STUFF
+//
+Crossroad::Crossroad() {
+    for (int i = 0; i < NUM_ROADS; i++) {
+        inRoad[i] = new Road(i);
+        outRoad[i] = new Road(i);
+    }
+}
+
+//
+Crossroad::~Crossroad() {
+    for (int i = 0; i < NUM_ROADS; i++) {
+        delete inRoad[i];
+        delete outRoad[i];
+    }
+}

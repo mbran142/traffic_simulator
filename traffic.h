@@ -77,6 +77,10 @@ enum color { GREEN, YELLOW, RED };
 struct Gridpoint {
     int x;
     int y;
+    Gridpoint() {
+        this->x = 0;
+        this->y = 0;
+    }
     Gridpoint(int x, int y) {
         this->x = x;
         this->y = y;
@@ -84,6 +88,11 @@ struct Gridpoint {
     Gridpoint(const Gridpoint& in) {
         this->x = in.x;
         this->y = in.y;
+    }
+    Gridpoint& operator=(const Gridpoint& g) {
+        this->x = g.x;
+        this->y = g.y;
+        return *this;
     }
 };
 

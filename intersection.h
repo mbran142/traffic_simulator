@@ -6,11 +6,13 @@
 
 class Intersection {
 public:
+    Intersection();
+    ~Intersection();
     void runSimulation();
 private:
-    Grid grid;
-    Crossroad crossroad;
-    SignalSystem signalSystem;
+    Grid* grid;
+    Crossroad* crossroad;
+    SignalSystem* signalSystem;
     friend std::ostream& operator<<(std::ostream& os, const Intersection& intersection);
 };
 

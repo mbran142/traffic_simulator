@@ -16,10 +16,11 @@ public:
     Lane(int, Gridpoint, Gridpoint, bool);
     bool backIsOpen() const;
     int backSpacesOpen() const;
-    Gridpoint getSpawnPoint() const;
     int getDirection() const;
 private:
+    const bool SPAWNER;
     const int DIRECTION;
+    Gridpoint specialPoint; //spawnpoint or killpoint
 };
 
 class Road {
@@ -36,9 +37,8 @@ public:
     Crossroad();
     ~Crossroad();
 private:
-    const int BEFORE_SIGNAL = 0;
-    const int AFTER_SIGNAL = 1;
-    Road* roads[2][NUM_ROADS];
+    Road* inRoad[NUM_ROADS];
+    Road* outRoad[NUM_ROADS];
 };
 
 #endif

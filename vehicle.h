@@ -11,6 +11,7 @@ public:
     const static int VCONST[SIZE_VEHICLES][SIZE_CONSTS];
     Vehicle(const Gridpoint& gp,int, int, const int[SIZE_CONSTS]);
     void tick();
+    void setEnvironment(const Intersection*);
 protected:
     const int DECELERATION = 1;
     const int ACCELERATION_MAX;
