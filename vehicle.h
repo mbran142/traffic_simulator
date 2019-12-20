@@ -1,33 +1,48 @@
 #ifndef _VEHICLE_H
 #define _VEHICLE_H
 
-#define SIZE_VEHICLES 4
-#define CAR 0
-#define VAN 1
-#define MOTERCYCLE 2
-#define TRUCK 3
-
-#define SIZE_CONSTS 3
-#define ACCELERATION 0
-#define SPEED 1
-#define SIZE 2 
+#include "traffic.h"
+#include "road.h"
 
 class Vehicle {
 public:
     const static int VCONST[SIZE_VEHICLES][SIZE_CONSTS];
-    Vehicle(const int[SIZE_CONSTS]);
+    Vehicle(int, int, const int[SIZE_CONSTS]);
+    void tick();
 protected:
+    const int DECELERATION = 1;
     const int ACCELERATION_MAX;
     const int SPEED_MAX;
     const int VEHICLE_SIZE;
+    int road, lane;
     int speed;
-    int position;
+    Gridpoint position;
+    bool checkSignal() const;
+    bool checkRightPedestrians() const;
+    void accelerate(bool);
+    bool goingToRunRedLight() const;
+    bool goingToRearEnd() const;
+    bool tooFast() const;
 };
 
 class Car: public Vehicle {
-private:
 public:
-    Car();
+    Car(int, int);
+};
+
+class Van: public Vehicle {
+public:
+    Van(int, int);
+};
+
+class Motercycle: public Vehicle {
+public:
+    Motercycle(int, int);
+};
+
+class Truck: public Vehicle {
+public:
+    Truck(int, int);
 };
 
 #endif

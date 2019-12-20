@@ -1,5 +1,5 @@
 #include <iostream>
-#include "traffic.h"
+#include "intersection.h"
 
 int main() {
 
