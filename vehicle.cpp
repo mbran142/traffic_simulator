@@ -7,7 +7,8 @@ const int Vehicle::VCONST[SIZE_VEHICLES][SIZE_CONSTS] = { { C_ACC, C_SPD, C_SIZE
                                                           { T_ACC, T_SPD, T_SIZE } };
 
 //COMMENT THIS
-Vehicle::Vehicle(int road, int lane, const int consts[SIZE_CONSTS]) : ACCELERATION_MAX(consts[ACCELERATION]), SPEED_MAX(consts[SPEED]), VEHICLE_SIZE(consts[SIZE]) {
+Vehicle::Vehicle(const Gridpoint& gp, int road, int lane, const int consts[SIZE_CONSTS]) :
+ACCELERATION_MAX(consts[ACCELERATION]), SPEED_MAX(consts[SPEED]), VEHICLE_SIZE(consts[SIZE]), position(gp) {
 
     this->road = road;
     this->lane = lane;
@@ -22,10 +23,17 @@ Vehicle::Vehicle(int road, int lane, const int consts[SIZE_CONSTS]) : ACCELERATI
     //TODO: decide whether to tick() or not
 };
 
-Car::Car(int road, int lane) : Vehicle(road, lane, Vehicle::VCONST[CAR]) {};
-Van::Van(int road, int lane) : Vehicle(road, lane, Vehicle::VCONST[VAN]) {};
-Motercycle::Motercycle(int road, int lane) : Vehicle(road, lane, Vehicle::VCONST[MOTERCYCLE]) {};
-Truck::Truck(int road, int lane) : Vehicle(road, lane, Vehicle::VCONST[TRUCK]) {};
+//Creates a car
+Car::Car(const Gridpoint& gp, int road, int lane) : Vehicle(gp, road, lane, Vehicle::VCONST[CAR]) {};
+
+//Creates a van
+Van::Van(const Gridpoint& gp, int road, int lane) : Vehicle(gp, road, lane, Vehicle::VCONST[VAN]) {};
+
+//Creates a motercycle
+Motercycle::Motercycle(const Gridpoint& gp, int road, int lane) : Vehicle(gp, road, lane, Vehicle::VCONST[MOTERCYCLE]) {};
+
+//Creates a 12-wheeler truck
+Truck::Truck(const Gridpoint& gp, int road, int lane) : Vehicle(gp, road, lane, Vehicle::VCONST[TRUCK]) {};
 
 void Vehicle::tick() {
     //continue whatever this car was doing

@@ -3,15 +3,6 @@
 
 #include "traffic.h"
 
-struct Gridpoint {
-    int x;
-    int y;
-    Gridpoint(int x, int y) {
-        this->x = x;
-        this->y = y;
-    }
-};
-
 class Grid {
 public:
     Grid();
@@ -22,7 +13,7 @@ private:
 
 class Lane {
 public:
-    Lane(Gridpoint startpoint, Gridpoint endpoint, bool spawnLane);
+    Lane(int, Gridpoint, Gridpoint, bool);
     bool backIsOpen() const;
     int backSpacesOpen() const;
     Gridpoint getSpawnPoint() const;
@@ -33,10 +24,11 @@ private:
 
 class Road {
 public:
-    Road();
+    Road(int);
     ~Road();
 private:
     Lane* lane[NUM_LANES_PER_ROAD];
+    const int DIRECTION;
 };
 
 class Crossroad {

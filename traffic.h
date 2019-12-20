@@ -73,4 +73,18 @@ enum color { GREEN, YELLOW, RED };
 #define T_SPD 3
 #define T_SIZE 6
 
+//gridpoint struct
+struct Gridpoint {
+    int x;
+    int y;
+    Gridpoint(int x, int y) {
+        this->x = x;
+        this->y = y;
+    }
+    Gridpoint(const Gridpoint& in) {
+        this->x = in.x;
+        this->y = in.y;
+    }
+};
+
 #endif

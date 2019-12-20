@@ -56,17 +56,18 @@ void TrafficSignal::cycleToNextStatus() {
 }
 
 
-//
+//Creates a signal system for a 4-war intersection
 SignalSystem::SignalSystem() {
     for (int i = 0; i < NUM_SIGNAL_SETS; i++)
         for (int j = 0; j < NUM_SIGNAL_SETS; j++)
-            //FIGURE OUT CONSTANTS
+            //FIGURE OUT CONSTANTS (they should be different for turning and straight lights)
             signals[i][j] = new TrafficSignal(0,0);
 }
 
-//
+//Deallocates memory used
 SignalSystem::~SignalSystem() {
     for (int i = 0; i < NUM_SIGNAL_SETS; i++)
         for (int j = 0; j < NUM_SIGNAL_SETS; j++)
             delete signals[i][j];
 }
+

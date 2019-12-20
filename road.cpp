@@ -14,7 +14,7 @@ bool Grid::isOpen(int i, int j) {
 
 
 //
-Lane::Lane(Gridpoint startpoint, Gridpoint endpoint, bool spawnpoint) {
+Lane::Lane(int dir, Gridpoint startpoint, Gridpoint endpoint, bool spawnpoint) : DIRECTION(dir) {
     //create a lane using this stuff
 }
 
@@ -43,10 +43,10 @@ int Lane::getDirection() const {
 
 
 //
-Road::Road() {
+Road::Road(int direction) : DIRECTION(direction) {
     for (int i = 0; i < NUM_LANES_PER_ROAD; i++) {
         //TODO: change this
-        lane[i] = new Lane(Gridpoint(0,0), Gridpoint(0,0), true);
+        lane[i] = new Lane(direction, Gridpoint(0,0), Gridpoint(0,0), true);
     }
 }
 
