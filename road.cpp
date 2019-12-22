@@ -1,4 +1,5 @@
 #include "road.h"
+#include "vehicle.h"
 
 //
 Grid::Grid() {
@@ -14,40 +15,8 @@ bool Grid::isOpen(int i, int j) {
 
 
 //Creates a lane on a road
-Lane::Lane(int dir, Gridpoint startpoint, Gridpoint endpoint, bool b) : SPAWNER(b), DIRECTION(dir) {
-    
-    //TODO: SPLIT THIS UP INTO SPAWNLANE AND ENDLANES ***REMEMBER THAT THE KILL TILES FOR A KILL LANE SHOULD = MAX SPEED
-    //decide where the special point is
-    if (SPAWNER) {
-
-        int x, y;
-
-        if (startpoint.x == endpoint.x) {
-            x = startpoint.x;
-            y = startpoint.y > endpoint.y ? startpoint.y + T_SIZE : startpoint.y - T_SIZE;
-        }
-        else {
-            y = startpoint.y;
-            x = startpoint.x + (startpoint.x > endpoint.y ? T_SIZE : T_SIZE * -1);
-        }
-
-        specialPoint.x = x;
-        specialPoint.y = y;
-    }
-
-    else specialPoint = endpoint;
-}
-
-//
-bool Lane::backIsOpen() const {
-    //check if there is room for another car to be spawned if there's one in the spawn queue
-    return true;
-}
-
-//
-int Lane::backSpacesOpen() const {
-    //check how many spaces are open in the back of the lane
-    return 0;
+Lane::Lane(int dir, Gridpoint start, Gridpoint end, const Intersection* itref) : DIRECTION(dir), START(start), END(end) {
+    intersection = itref;
 }
 
 //Gets the direction the lane is going
@@ -55,12 +24,77 @@ int Lane::getDirection() const {
     return DIRECTION;
 }
 
+//Create new spawnlane
+Spawnlane::Spawnlane(int dir, Gridpoint start, Gridpoint end, const Intersection* itref) : Lane(dir, start, end, itref), SPAWNPOINT(Spawnlane::determineSpawnpoint(start, end)) {
+    vehicleQueue = new std::queue<Vehicle*>();
+}
+
+//Deallocate resources used by spawnlane
+Spawnlane::~Spawnlane() {
+
+    //free contents of queue
+    while (!vehicleQueue->empty()) {
+        delete vehicleQueue->front();
+        vehicleQueue->pop();
+    }
+
+    //free queue
+    delete vehicleQueue;
+}
 
 //
-Road::Road(int direction) : DIRECTION(direction) {
+Gridpoint Spawnlane::determineSpawnpoint(Gridpoint start, Gridpoint end) {
+
+    int x, y;
+
+    if (start.x == end.x) {
+        x = start.x;
+        y = start.y > end.y ? start.y + T_SIZE : start.y - T_SIZE;
+    }
+    else {
+        y = start.y;
+        x = start.x + (start.x > end.y ? T_SIZE : T_SIZE * -1);
+    }
+
+    return Gridpoint(x, y);
+}
+
+//Checks if there is space for a car to be removed from the queue
+bool Spawnlane::backIsOpen() const {
+    //check if there is room for another car to be spawned if there's one in the spawn queue
+    return true;
+}
+
+//Checks how many spaces are open in front of a newly spawned car
+int Spawnlane::backSpacesOpen() const {
+    //check how many spaces are open in the back of the lane
+    return 0;
+}
+
+//Ticks the road one unit in time
+void Spawnlane::tick() {
+    //TODO: implement this; it should tick every vehicle in the lane
+}
+
+//Adds a new vehicle to the queue
+void Spawnlane::spawnVehicle() {
+    vehicleQueue->push(Vehicle::generateRandomVehicle(SPAWNPOINT, intersection));
+}
+
+//
+Gridpoint Endlane::determineEndpoint(Gridpoint start, Gridpoint end) {
+    return end;
+    //TODO: consider changing this
+}
+
+//
+Road::Road(int direction, bool in) : DIRECTION(direction) {
+
     for (int i = 0; i < NUM_LANES_PER_ROAD; i++) {
         //TODO: change this
-        lane[i] = new Lane(direction, Gridpoint(0,0), Gridpoint(0,0), true);
+        //if (in) lane[i] = new Spawnlane(direction, );
+        //else    lane[i] = new Endlane(direction,);
+        std::cout << "test" << std::endl;
     }
 }
 
@@ -75,8 +109,8 @@ Road::~Road() {
 //
 Crossroad::Crossroad() {
     for (int i = 0; i < NUM_ROADS; i++) {
-        inRoad[i] = new Road(i);
-        outRoad[i] = new Road(i);
+        inRoad[i] = new Road(i, true);
+        outRoad[i] = new Road(i, false);
     }
 }
 

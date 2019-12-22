@@ -9,9 +9,9 @@ struct Gridpoint;
 class Vehicle {
 public:
     const static int VCONST[SIZE_VEHICLES][SIZE_CONSTS];
-    Vehicle(const Gridpoint& gp,int, int, const int[SIZE_CONSTS]);
+    Vehicle(const Gridpoint& gp, const Intersection*, const int[SIZE_CONSTS]);
     void tick();
-    void setEnvironment(const Intersection*);
+    static Vehicle* generateRandomVehicle(Gridpoint, const Intersection*);
 protected:
     const int DECELERATION = 1;
     const int ACCELERATION_MAX;
@@ -31,22 +31,22 @@ protected:
 
 class Car: public Vehicle {
 public:
-    Car(const Gridpoint&, int, int);
+    Car(const Gridpoint&, const Intersection*);
 };
 
 class Van: public Vehicle {
 public:
-    Van(const Gridpoint&, int, int);
+    Van(const Gridpoint&, const Intersection*);
 };
 
 class Motercycle: public Vehicle {
 public:
-    Motercycle(const Gridpoint&, int, int);
+    Motercycle(const Gridpoint&, const Intersection*);
 };
 
 class Truck: public Vehicle {
 public:
-    Truck(const Gridpoint&, int, int);
+    Truck(const Gridpoint&, const Intersection*);
 };
 
 #endif
