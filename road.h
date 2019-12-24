@@ -18,7 +18,7 @@ private:
 class Lane {
 public:
     Lane(int, Gridpoint, Gridpoint, const Intersection*);
-    virtual ~Lane() = default;
+    virtual ~Lane();
     int getDirection() const;
     virtual void tick() = 0;
 protected:
@@ -43,8 +43,8 @@ private:
 
 class Endlane : public Lane {
 public:
-    Endlane(int dir, Gridpoint start, Gridpoint end, const Intersection* itref) : Lane(dir, start, end, itref), ENDPOINT(Endlane::determineEndpoint(start, end)) { }
-    ~Endlane() = default;
+    Endlane(int dir, Gridpoint start, Gridpoint end, const Intersection* itref);
+    ~Endlane();
     static Gridpoint determineEndpoint(Gridpoint, Gridpoint);
     void tick();
 private:
@@ -53,7 +53,8 @@ private:
 
 class Road {
 public:
-    Road(int, bool);
+    const static int LANE_LOC[IN_OUT_COUNT][NUM_ROADS][NUM_LANES][START_END_COUNT];
+    Road(int, bool, const Intersection*);
     ~Road();
 private:
     Lane* lane[NUM_LANES_PER_ROAD];
@@ -62,7 +63,7 @@ private:
 
 class Crossroad {
 public:
-    Crossroad();
+    Crossroad(const Intersection*);
     ~Crossroad();
 private:
     Road* inRoad[NUM_ROADS];

@@ -20,12 +20,27 @@ const int right_turn_rate = 40;
 //road.h
 enum color { GREEN, YELLOW, RED };
 
+#define START_END_COUNT 4
+#define START_X 0
+#define START_Y 1
+#define END_X 2
+#define END_Y 3
+
+#define IN_OUT_COUNT 2
+#define IN_LANE 0
+#define OUT_LANE 1
+
+#define NUM_LANES 3
+#define LEFT 0
+#define MIDDLE 1
+#define RIGHT 2
+
 //lanes
 #define LANE_SIZE 26
 #define INTERSECTION_SIZE 10
 
 //grid size
-#define GRID_SIZE (LANE_SIZE + INTERSECTION_SIZE)
+#define GRID_SIZE (LANE_SIZE * 2 + INTERSECTION_SIZE)
 #define PRINT_SIZE (GRID_SIZE - T_SIZE)
 
 //roads

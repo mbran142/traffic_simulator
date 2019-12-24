@@ -1,6 +1,23 @@
 #include "road.h"
 #include "vehicle.h"
 
+//[Spawn vs End][N E S W][Left Middle Right][s_x s_y e_x e_y]
+const int Road::LANE_LOC[IN_OUT_COUNT][NUM_ROADS][NUM_LANES][START_END_COUNT] =
+    {
+    /* spawn lanes */ {
+        { { 31, 61, 31, 36 }, { 32, 61, 32, 36 }, { 33, 61, 33, 36 } }, //north
+        { { 00, 31, 25, 31 }, { 00, 32, 25, 32 }, { 00, 33, 25, 33 } }, //east
+        { { 30, 00, 30, 25 }, { 29, 00, 29, 25 }, { 28, 00, 28, 25 } }, //south
+        { { 61, 30, 36, 30 }, { 61, 29, 36, 29 }, { 61, 28, 36, 28 } }  //west
+    },
+    /* end lanes */ {
+        { { 31, 25, 31, 00 }, { 32, 25, 32, 00 }, { 33, 25, 33, 00 } }, //north
+        { { 36, 31, 61, 31 }, { 36, 32, 31, 32 }, { 36, 33, 61, 33 } }, //east
+        { { 30, 36, 30, 61 }, { 29, 36, 29, 61 }, { 28, 36, 28, 61 } }, //south
+        { { 25, 30, 00, 30 }, { 25, 29, 00, 29 }, { 25, 28, 00, 28 } }  //west
+    }
+    };
+
 //
 Grid::Grid() {
     for (int i = 0; i < GRID_SIZE; i++)
@@ -18,6 +35,9 @@ bool Grid::isOpen(int i, int j) {
 Lane::Lane(int dir, Gridpoint start, Gridpoint end, const Intersection* itref) : DIRECTION(dir), START(start), END(end) {
     intersection = itref;
 }
+
+//Default lane destructor
+Lane::~Lane() { }
 
 //Gets the direction the lane is going
 int Lane::getDirection() const {
@@ -81,36 +101,47 @@ void Spawnlane::spawnVehicle() {
     vehicleQueue->push(Vehicle::generateRandomVehicle(SPAWNPOINT, intersection));
 }
 
+//Default constructor for endlane
+Endlane::Endlane(int dir, Gridpoint start, Gridpoint end, const Intersection* itref) : Lane(dir, start, end, itref), ENDPOINT(Endlane::determineEndpoint(start, end)) { }
+
+//Default destructor for endlane
+Endlane::~Endlane() { }
+
 //
 Gridpoint Endlane::determineEndpoint(Gridpoint start, Gridpoint end) {
     return end;
     //TODO: consider changing this
 }
 
+void Endlane::tick() {
+    //TODO: implement this; should destroy vehicles that have reached the endpoint
+}
+
 //
-Road::Road(int direction, bool in) : DIRECTION(direction) {
+Road::Road(int dir, bool in, const Intersection* itref) : DIRECTION(dir) {
 
     for (int i = 0; i < NUM_LANES_PER_ROAD; i++) {
-        //TODO: change this
-        //if (in) lane[i] = new Spawnlane(direction, );
-        //else    lane[i] = new Endlane(direction,);
-        std::cout << "test" << std::endl;
+        if (in) lane[i] = new Spawnlane(dir,
+                Gridpoint(Road::LANE_LOC[IN_LANE][dir][i][START_X], Road::LANE_LOC[IN_LANE][dir][i][START_Y]),
+                Gridpoint(Road::LANE_LOC[IN_LANE][dir][i][END_X], Road::LANE_LOC[IN_LANE][dir][i][END_Y]), itref);
+        else    lane[i] = new Endlane(dir,
+                Gridpoint(Road::LANE_LOC[OUT_LANE][dir][i][START_X], Road::LANE_LOC[OUT_LANE][dir][i][START_Y]),
+                Gridpoint(Road::LANE_LOC[OUT_LANE][dir][i][END_X], Road::LANE_LOC[OUT_LANE][dir][i][END_Y]), itref);
     }
 }
 
 //
 Road::~Road() {
-    for (int i = 0; i < NUM_LANES_PER_ROAD; i++) {
+    for (int i = 0; i < NUM_LANES_PER_ROAD; i++)
         delete lane[i];
-    }
 }
 
 
 //
-Crossroad::Crossroad() {
+Crossroad::Crossroad(const Intersection* itref) {
     for (int i = 0; i < NUM_ROADS; i++) {
-        inRoad[i] = new Road(i, true);
-        outRoad[i] = new Road(i, false);
+        inRoad[i] = new Road(i, true, itref);
+        outRoad[i] = new Road(i, false, itref);
     }
 }
 
