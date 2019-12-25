@@ -1,12 +1,12 @@
-OBJ_FILES = intersection.o road.o signal.o vehicle.o traffic.o
+OBJ_FILES =  road.o signal.o vehicle.o traffic.o intersection.o
 BIN_NAME = sim
 CC_OPTIONS = -g -Wall -ggdb3 -I.
 
-%.o : %.cpp %.h
-	g++ -c -o $@ $< $(CC_OPTIONS)
-
-$(BIN_NAME): $(OBJ_FILES) traffic.h
+$(BIN_NAME): $(OBJ_FILES)
 	g++ -o $@ $^ $(CC_OPTIONS)
+
+%.o : %.cpp %.h traffic.h
+	g++ -c -o $@ $< $(CC_OPTIONS)
 
 .PHONY: clean
 clean:

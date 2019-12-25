@@ -6,6 +6,8 @@
 #include <cstdlib>
 #include <ctime>
 
+#define DEBUG true
+
 //RATES OF OCCURENCES
 
 //rates of certain cars
@@ -50,7 +52,7 @@ enum color { GREEN, YELLOW, RED };
 
 //grid size
 #define GRID_SIZE (LANE_SIZE * 2 + INTERSECTION_SIZE)
-#define PRINT_BORDER 10
+#define PRINT_BORDER 16
 #define PRINT_SIZE (GRID_SIZE - PRINT_BORDER)
 
 //roads

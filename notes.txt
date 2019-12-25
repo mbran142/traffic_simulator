@@ -63,7 +63,7 @@ traffic.cpp
 TODO:
 
 ~ Create a relationship in which every vehicle has a pointer reference to the intersection its on
-    - Change the split the lane class into a Spanwlane and Endlane class
+    - split the lane class into a Spanwlane and Endlane class
         + Inheritence relationship is fine
     - Spawnlane will have (in addition to its current functionality)
         + A spawn() function that adds a random car

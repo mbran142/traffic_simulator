@@ -30,25 +30,21 @@ bool Grid::isOpen(int i, int j) const {
     return grid[i][j] == -1;
 }
 
-//Returns which lines should be drawn (vh)
-int Grid::drawRoadLine(int i, int j) {
-    return Grid::decideToDrawLine(i, j) * 10 + Grid::decideToDrawLine(j, i);
+//Decides which lines to draw. Returns in a 2-digit decimal value of vh
+Gridpoint Grid::drawRoadLine(int i, int j) {
+    return Gridpoint(Grid::lineStatus(i, j), Grid::lineStatus(j, i));
 }
 
-//Decides which lines to draw
-int Grid::decideToDrawLine(int i, int j) {
-
-    int status;
-
+int Grid::lineStatus(int i, int j) {
+    int status = EMPTY;
     if (binarySearch(j, (const int[]){26, 27, 34, 35}, 4) && (i == 25 || i == 35))
         status = BOTH_LINES;
-    else if ((j > 0 && j < 26) || (j > 35 || j < 62)) {
+    else if ((j > 0 && j < 26) || (j > 35 && j < 62)) {
         if (binarySearch(i, (const int[]){27, 30, 33}, 3))
             status = BOTH_LINES;
         else if (binarySearch(i, (const int[]){28, 29, 31, 32}, 4))
             status = j < 26 ? BOTTOM_LINE : TOP_LINE;
     }
-
     return status;
 }
 

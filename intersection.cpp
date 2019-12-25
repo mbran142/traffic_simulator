@@ -26,38 +26,63 @@ std::ostream& operator<<(std::ostream& os, const Intersection& it) {
     std::string top, bot;
     //0 = none | 1 = top / right single | 2 = bot / left single | 3 = double
     int quadrant[2][2];
-    int status, h, v;
+    Gridpoint status;
+    int h, v;
 
-    for (int i = PRINT_BORDER; i < PRINT_SIZE; i++) {
+    //print top indeces
+    if (DEBUG) {
+        std::string botLine;
+        for (int i = PRINT_BORDER; i < PRINT_SIZE; i++) {
+            top.push_back(i % 10 ? ' ' : i / 10 + '0');
+            top.push_back(' ');
+            bot.push_back(i % 10 + '0');
+            bot.push_back(' ');
+            botLine.push_back(i == PRINT_BORDER ? '+' : '-');
+            botLine.push_back('-');
+        }
+        std::cout << "  " << top << std::endl << "  "<< bot << std::endl << "  " << botLine << std::endl;;
+    }
 
-        quadrant[0][0] = quadrant[0][1] = quadrant[1][0] = quadrant[1][1] = EMPTY;
+    //y axis
+    for (int j = PRINT_BORDER; j < PRINT_SIZE; j++) {
 
         top.clear();
         bot.clear();
 
-        for (int j = PRINT_BORDER; j < PRINT_SIZE; j++) {
+        //print left indeces
+        if (DEBUG) {
+            top.push_back(j / 10 + '0');
+            top.push_back(j % 10 + '0');
+            top.push_back('|');
+            bot += "  |";
+        }
+
+        //x axis
+        for (int i = PRINT_BORDER; i < PRINT_SIZE; i++) {
+
+            quadrant[0][0] = quadrant[0][1] = quadrant[1][0] = quadrant[1][1] = EMPTY;
 
             //check for signalSystem.lightStatus(i,j) (where i = N E S W, j = L M R)
 
             status = Grid::drawRoadLine(i, j);
-            v = status / 10;
-            h = status % 10;
+            v = status.x;
+            h = status.y;
 
             /*if (!it.getGrid().isOpen(i, j))
                 quadrant[0][0] = 'C';*/
 
             switch (v) {
-                case TOP_LINE:    quadrant[0][1] += VERTICAL_LINE; break;
-                case BOTTOM_LINE: quadrant[1][1] += VERTICAL_LINE; break;
-                case BOTH_LINES:  quadrant[0][1] += VERTICAL_LINE;
-                                  quadrant[1][1] += VERTICAL_LINE; break;
+                case TOP_LINE:    quadrant[0][1] = VERTICAL_LINE; break;
+                case BOTTOM_LINE: quadrant[1][1] = VERTICAL_LINE; break;
+                case BOTH_LINES:  quadrant[0][1] = VERTICAL_LINE;
+                                  quadrant[1][1] = VERTICAL_LINE; break;
             }
 
             switch (h) {
-                case RIGHT_LINE:  quadrant[1][1] += HORIZONTAL_LINE; break;
-                case LEFT_LINE:   quadrant[1][0] += HORIZONTAL_LINE; break;
-                case BOTH_LINES:  quadrant[1][1] += HORIZONTAL_LINE;
-                                  quadrant[1][0] += HORIZONTAL_LINE; break;
+                case RIGHT_LINE:  quadrant[1][1] = quadrant[1][1] == EMPTY ? HORIZONTAL_LINE : BOTH_LINES ; break;
+                case LEFT_LINE:   quadrant[1][0] = HORIZONTAL_LINE; break;
+                case BOTH_LINES:  quadrant[1][1] = quadrant[1][1] == EMPTY ? HORIZONTAL_LINE : BOTH_LINES ;
+                                  quadrant[1][0] = HORIZONTAL_LINE; break;
             }
                 
             top.push_back(Intersection::codeChar(quadrant[0][0]));
@@ -68,7 +93,7 @@ std::ostream& operator<<(std::ostream& os, const Intersection& it) {
 
         std::cout << top << std::endl << bot;
 
-        if (i != PRINT_SIZE - 1)
+        if (j != PRINT_SIZE - 1)
             std::cout << std::endl;
     }
 

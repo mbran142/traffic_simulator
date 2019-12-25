@@ -11,10 +11,10 @@ class Grid {
 public:
     Grid();
     bool isOpen(int, int) const;
-    static int drawRoadLine(int, int);
+    static Gridpoint drawRoadLine(int, int);
 private:
     int grid[GRID_SIZE][GRID_SIZE];
-    static int decideToDrawLine(int, int);
+    static int lineStatus(int, int);
 };
 
 class Lane {
