@@ -5,7 +5,9 @@ int main() {
 
     srand((unsigned)time(NULL));
 
-    std::cout << "Traffic sim test" << std::endl;
+    Intersection intersection;
+
+    std::cout << intersection << std::endl;
 
     return 0;
 }

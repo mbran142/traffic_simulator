@@ -10,9 +10,11 @@ class Intersection;
 class Grid {
 public:
     Grid();
-    bool isOpen(int, int);
+    bool isOpen(int, int) const;
+    static int drawRoadLine(int, int);
 private:
-    bool grid[GRID_SIZE][GRID_SIZE];
+    int grid[GRID_SIZE][GRID_SIZE];
+    static int decideToDrawLine(int, int);
 };
 
 class Lane {

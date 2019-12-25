@@ -9,11 +9,13 @@ public:
     Intersection();
     ~Intersection();
     void runSimulation();
+    friend std::ostream& operator<<(std::ostream& os, const Intersection& intersection);
+    Grid& getGrid() const;
 private:
     Grid* grid;
     Crossroad* crossroad;
     SignalSystem* signalSystem;
-    friend std::ostream& operator<<(std::ostream& os, const Intersection& intersection);
+    static char codeChar(int);
 };
 
 #endif

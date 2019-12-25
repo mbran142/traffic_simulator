@@ -3,33 +3,54 @@
 
 //[Spawn vs End][N E S W][Left Middle Right][s_x s_y e_x e_y]
 const int Road::LANE_LOC[IN_OUT_COUNT][NUM_ROADS][NUM_LANES][START_END_COUNT] =
-    {
-    /* spawn lanes */ {
+{
+    { /* spawn lanes */
         { { 31, 61, 31, 36 }, { 32, 61, 32, 36 }, { 33, 61, 33, 36 } }, //north
         { { 00, 31, 25, 31 }, { 00, 32, 25, 32 }, { 00, 33, 25, 33 } }, //east
         { { 30, 00, 30, 25 }, { 29, 00, 29, 25 }, { 28, 00, 28, 25 } }, //south
         { { 61, 30, 36, 30 }, { 61, 29, 36, 29 }, { 61, 28, 36, 28 } }  //west
     },
-    /* end lanes */ {
+    { /* end lanes */
         { { 31, 25, 31, 00 }, { 32, 25, 32, 00 }, { 33, 25, 33, 00 } }, //north
         { { 36, 31, 61, 31 }, { 36, 32, 31, 32 }, { 36, 33, 61, 33 } }, //east
         { { 30, 36, 30, 61 }, { 29, 36, 29, 61 }, { 28, 36, 28, 61 } }, //south
         { { 25, 30, 00, 30 }, { 25, 29, 00, 29 }, { 25, 28, 00, 28 } }  //west
     }
-    };
+};
 
-//
+//Constructor for grid
 Grid::Grid() {
     for (int i = 0; i < GRID_SIZE; i++)
         for (int j = 0; j < GRID_SIZE; j++)
-            grid[i][j] = false;
+            grid[i][j] = EMPTY;
 }
 
-//
-bool Grid::isOpen(int i, int j) {
-    return grid[i][j];
+//Checks if this gridspace is open
+bool Grid::isOpen(int i, int j) const {
+    return grid[i][j] == -1;
 }
 
+//Returns which lines should be drawn (vh)
+int Grid::drawRoadLine(int i, int j) {
+    return Grid::decideToDrawLine(i, j) * 10 + Grid::decideToDrawLine(j, i);
+}
+
+//Decides which lines to draw
+int Grid::decideToDrawLine(int i, int j) {
+
+    int status;
+
+    if (binarySearch(j, (const int[]){26, 27, 34, 35}, 4) && (i == 25 || i == 35))
+        status = BOTH_LINES;
+    else if ((j > 0 && j < 26) || (j > 35 || j < 62)) {
+        if (binarySearch(i, (const int[]){27, 30, 33}, 3))
+            status = BOTH_LINES;
+        else if (binarySearch(i, (const int[]){28, 29, 31, 32}, 4))
+            status = j < 26 ? BOTTOM_LINE : TOP_LINE;
+    }
+
+    return status;
+}
 
 //Creates a lane on a road
 Lane::Lane(int dir, Gridpoint start, Gridpoint end, const Intersection* itref) : DIRECTION(dir), START(start), END(end) {
@@ -62,7 +83,7 @@ Spawnlane::~Spawnlane() {
     delete vehicleQueue;
 }
 
-//
+//Determines the point at which vehicles spawn in a lane
 Gridpoint Spawnlane::determineSpawnpoint(Gridpoint start, Gridpoint end) {
 
     int x, y;
@@ -107,12 +128,13 @@ Endlane::Endlane(int dir, Gridpoint start, Gridpoint end, const Intersection* it
 //Default destructor for endlane
 Endlane::~Endlane() { }
 
-//
+//Determines the despawn point for cars on an endlane
 Gridpoint Endlane::determineEndpoint(Gridpoint start, Gridpoint end) {
     return end;
     //TODO: consider changing this
 }
 
+//Simulates one unit of time
 void Endlane::tick() {
     //TODO: implement this; should destroy vehicles that have reached the endpoint
 }
@@ -130,14 +152,14 @@ Road::Road(int dir, bool in, const Intersection* itref) : DIRECTION(dir) {
     }
 }
 
-//
+//Destructor for road
 Road::~Road() {
     for (int i = 0; i < NUM_LANES_PER_ROAD; i++)
         delete lane[i];
 }
 
 
-//
+//Constructor for crossroad
 Crossroad::Crossroad(const Intersection* itref) {
     for (int i = 0; i < NUM_ROADS; i++) {
         inRoad[i] = new Road(i, true, itref);
@@ -145,7 +167,7 @@ Crossroad::Crossroad(const Intersection* itref) {
     }
 }
 
-//
+//Destructor for crossroad
 Crossroad::~Crossroad() {
     for (int i = 0; i < NUM_ROADS; i++) {
         delete inRoad[i];

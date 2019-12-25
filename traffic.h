@@ -35,13 +35,23 @@ enum color { GREEN, YELLOW, RED };
 #define MIDDLE 1
 #define RIGHT 2
 
+#define NO_LINE 0
+#define TOP_LINE 1
+#define RIGHT_LINE 1
+#define BOTTOM_LINE 2
+#define LEFT_LINE 2
+#define HORIZONTAL_LINE 1
+#define VERTICAL_LINE 2
+#define BOTH_LINES 3
+
 //lanes
 #define LANE_SIZE 26
 #define INTERSECTION_SIZE 10
 
 //grid size
 #define GRID_SIZE (LANE_SIZE * 2 + INTERSECTION_SIZE)
-#define PRINT_SIZE (GRID_SIZE - T_SIZE)
+#define PRINT_BORDER 10
+#define PRINT_SIZE (GRID_SIZE - PRINT_BORDER)
 
 //roads
 #define NUM_ROADS 4
@@ -62,6 +72,7 @@ enum color { GREEN, YELLOW, RED };
 #define VAN 1
 #define MOTERCYCLE 2
 #define TRUCK 3
+#define EMPTY -1
 
 #define SIZE_CONSTS 3
 #define ACCELERATION 0
@@ -86,7 +97,7 @@ enum color { GREEN, YELLOW, RED };
 //truck
 #define T_ACC 1
 #define T_SPD 3
-#define T_SIZE 6
+#define T_SIZE 4
 
 //gridpoint struct
 struct Gridpoint {
@@ -110,5 +121,24 @@ struct Gridpoint {
         return *this;
     }
 };
+
+//checks whether integer 'search' exists in sorted array arr
+inline bool binarySearch(int search, const int arr[], int size) {
+
+    int i = 0,
+        j = size - 1,
+        m;
+
+    while (i <= j) {
+        m = (i + j) / 2;
+        if (search < arr[m])
+            j = m - 1;
+        else if (search > arr[m])
+            i = m + 1;
+        else return true;
+    }
+
+    return false;
+}
 
 #endif

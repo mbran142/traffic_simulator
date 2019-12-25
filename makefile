@@ -5,7 +5,7 @@ CC_OPTIONS = -g -Wall -ggdb3 -I.
 %.o : %.cpp %.h
 	g++ -c -o $@ $< $(CC_OPTIONS)
 
-$(BIN_NAME): $(OBJ_FILES)
+$(BIN_NAME): $(OBJ_FILES) traffic.h
 	g++ -o $@ $^ $(CC_OPTIONS)
 
 .PHONY: clean
