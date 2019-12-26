@@ -1,6 +1,8 @@
 #include "road.h"
 #include "vehicle.h"
 
+extern int totalTicks;
+
 //[Spawn vs End][N E S W][Left Middle Right][s_x s_y e_x e_y]
 const int Road::LANE_LOC[IN_OUT_COUNT][NUM_ROADS][NUM_LANES][START_END_COUNT] =
 {
@@ -50,7 +52,12 @@ int Grid::lineStatus(int i, int j) {
 
 //Creates a lane on a road
 Lane::Lane(int dir, Gridpoint start, Gridpoint end, const Intersection* itref) : DIRECTION(dir), START(start), END(end) {
-    intersection = itref;
+
+    this->itref = itref;
+
+    //lane starts empty (NULL => empty space)
+    for (int i = 0; i < LANE_SIZE; i++)
+        space[i] = NULL;
 }
 
 //Default lane destructor
@@ -96,6 +103,27 @@ Gridpoint Spawnlane::determineSpawnpoint(Gridpoint start, Gridpoint end) {
     return Gridpoint(x, y);
 }
 
+//decide whether to spawn a vehicle based on rng and time
+bool Spawnlane::decideToSpawnVehicle() {
+
+    /*
+                [226-299] is low
+    [0,100] and [176-225] is medium
+                [101-175] is high
+    */
+
+    int chance, curTime = totalTicks % 300;
+
+    if (curTime > 225)
+        chance = low_rate;
+    else if (curTime > 100 && curTime <= 175)
+        chance = high_rate;
+    else
+        chance = med_rate;
+    
+    return (rand() % 100 + 1) <= chance;
+}
+
 //Checks if there is space for a car to be removed from the queue
 bool Spawnlane::backIsOpen() const {
     //check if there is room for another car to be spawned if there's one in the spawn queue
@@ -110,12 +138,26 @@ int Spawnlane::backSpacesOpen() const {
 
 //Ticks the road one unit in time
 void Spawnlane::tick() {
-    //TODO: implement this; it should tick every vehicle in the lane
+
+    if (Spawnlane::decideToSpawnVehicle())
+        this->spawnVehicle();
+
+    for (int i = 0; i < LANE_SIZE; i++) {
+
+        //tick each vehicle
+        if (space[i] != NULL) {
+            space[i]->tick();
+            i += space[i]->getSize() - 1;
+        }
+    }
+
+    //update the position of all cars; if cars have left the lane, then give them to the intersection or whatever
+    //FIGURE OUT HOW TO DO THIS NEXT^
 }
 
 //Adds a new vehicle to the queue
 void Spawnlane::spawnVehicle() {
-    vehicleQueue->push(Vehicle::generateRandomVehicle(SPAWNPOINT, intersection));
+    vehicleQueue->push(Vehicle::generateRandomVehicle(SPAWNPOINT, itref));
 }
 
 //Default constructor for endlane
@@ -154,6 +196,11 @@ Road::~Road() {
         delete lane[i];
 }
 
+//Ticks the road one unit further in time
+void Road::tick() {
+    for (int i = 0; i < NUM_LANES; i++)
+        lane[i]->tick();
+}
 
 //Constructor for crossroad
 Crossroad::Crossroad(const Intersection* itref) {
@@ -168,5 +215,13 @@ Crossroad::~Crossroad() {
     for (int i = 0; i < NUM_ROADS; i++) {
         delete inRoad[i];
         delete outRoad[i];
+    }
+}
+
+//Move the elements of the crossroad one unit in time
+void Crossroad::tick() {
+    for (int i = 0; i < NUM_ROADS; i++) {
+        inRoad[i]->tick();
+        outRoad[i]->tick();
     }
 }

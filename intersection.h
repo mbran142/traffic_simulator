@@ -3,6 +3,7 @@
 
 #include "road.h"
 #include "signal.h"
+#include <vector>
 
 class Intersection {
 public:
@@ -11,6 +12,7 @@ public:
     void runSimulation();
     friend std::ostream& operator<<(std::ostream& os, const Intersection& intersection);
     Grid& getGrid() const;
+    void tick();
 private:
     Grid* grid;
     Crossroad* crossroad;

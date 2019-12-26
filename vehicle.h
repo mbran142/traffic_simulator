@@ -11,19 +11,18 @@ public:
     const static int VCONST[SIZE_VEHICLES][SIZE_CONSTS];
     Vehicle(const Gridpoint& gp, const Intersection*, const int[SIZE_CONSTS]);
     void tick();
+    int getSize() const;
     static Vehicle* generateRandomVehicle(Gridpoint, const Intersection*);
 protected:
-    const int DECELERATION = 1;
+    const int DECELERATION = ACCELERATION_MAX;
     const int ACCELERATION_MAX;
     const int SPEED_MAX;
     const int VEHICLE_SIZE;
+    const int TURN_SPEED = SPEED_MAX / 2;
     const Intersection* localEnvironment;
-    int road, lane;
-    int speed;
+    int acceleration, speed, direction, destination;
     Gridpoint position;
     bool checkSignal() const;
-    bool checkRightPedestrians() const;
-    void accelerate(bool);
     bool goingToRunRedLight() const;
     bool goingToRearEnd() const;
     bool tooFast() const;

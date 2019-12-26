@@ -12,20 +12,64 @@ ACCELERATION_MAX(consts[ACCELERATION]), SPEED_MAX(consts[SPEED]), VEHICLE_SIZE(c
 
     localEnvironment = itref;
 
-    //TODO: decide if what variables I need to determine direction traveling
-    //i.e., direction, turnLeft, goStraight, turnRight
-
     //calculate initial speed
+    acceleration = 0;
     speed = SPEED_MAX;
     while (this->tooFast())
         speed--;
 
-    //TODO: decide whether to tick() or not
+    if (gp.x == 0)
+        direction = EAST;
+    else if (gp.x == 61)
+        direction = WEST;
+    else if (gp.y == 0)
+        direction = SOUTH;
+    else
+        direction = NORTH;
+
+    destination = STRAIGHT; //REMOVE THIS LATER
+    //TO DO: DECIDE DESTINATION (left lane = turn or U-turn, mid = straight, right = straight or right turn)
+    //maybe decide this in the constructor, maybe not
 };
 
 //Simulates one unit of time for the vehicle
 void Vehicle::tick() {
-    //continue whatever this car was doing
+
+    int temp;
+
+    //change acceleration
+    temp = speed;
+    acceleration = ACCELERATION_MAX + 1;
+    do {
+        acceleration--;
+        speed = temp;
+        speed += acceleration;
+    } while (acceleration >= DECELERATION * -1 && this->tooFast());
+    
+    //change speed;
+    speed = temp + acceleration;
+
+    //change position
+    switch (direction) {
+        case NORTH: position.y += speed; break;
+        case EAST : position.x += speed; break;
+        case SOUTH: position.y -= speed; break;
+        case WEST : position.x -= speed; break;
+        //TODO:
+        // 1) if this vehicle passes over the bounds of its lane, find how far over it passed and send it somewhere else
+    }
+
+    /*
+    STUFF NEXT
+    - implement Vehicle::tooFast()
+        + decide how Vehicle will be able to check cars in front of it and red lights and stuff
+    - figure out how vehicles will go from lanes to the intersection to lanes
+        + I'll probably add NE, NW, SE, SW directions and itll go diagonally through the intersection
+    */
+}
+
+int Vehicle::getSize() const {
+    return VEHICLE_SIZE;
 }
 
 //creates a random vehicle
@@ -61,17 +105,6 @@ bool Vehicle::checkSignal() const {
     return true;
 }
 
-//checks if there are pedstrians walking in the way of a right turn
-bool Vehicle::checkRightPedestrians() const {
-    //check if there are pedestrains walking where this car would turn right
-    return true;
-}
-
-//accelerates or decelerates
-void Vehicle::accelerate(bool faster) {
-    //accelerate if true, decelerate if false
-}
-
 //checks if the vehicle is on track to run a red light
 bool Vehicle::goingToRunRedLight() const {
     //check if this guys gonna run a red light. take into account yellows!
@@ -81,6 +114,7 @@ bool Vehicle::goingToRunRedLight() const {
 //checks if the vehicle is on track to read-end someone
 bool Vehicle::goingToRearEnd() const {
     //check if this guys gonna read end the guy in front of him. Take into account their speed
+    //cars should be at least [NEXT_CAR_SPEED] spaces away from the car in front of them
     return false;
 }
 

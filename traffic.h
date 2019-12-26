@@ -19,6 +19,11 @@ const int car_rate = 91,
 //rates of turning right in the rightmost lane
 const int right_turn_rate = 40;
 
+//rates of cars spawning
+const int high_rate = 15,
+          med_rate  = 10,
+          low_rate  = 5;
+
 //road.h
 enum color { GREEN, YELLOW, RED };
 
@@ -81,24 +86,29 @@ enum color { GREEN, YELLOW, RED };
 #define SPEED 1
 #define SIZE 2
 
+#define STRAIGHT 0
+#define LEFT_TURN 1
+#define RIGHT_TURN 2
+#define U_TURN 3
+
 //car
 #define C_ACC 2
-#define C_SPD 5
+#define C_SPD 4
 #define C_SIZE 2
 
 //van
-#define V_ACC 2
-#define V_SPD 4
+#define V_ACC 1
+#define V_SPD 3
 #define V_SIZE 3
 
 //motercycle
 #define M_ACC 2
-#define M_SPD 5
+#define M_SPD 4
 #define M_SIZE 1
 
 //truck
 #define T_ACC 1
-#define T_SPD 3
+#define T_SPD 2
 #define T_SIZE 4
 
 //gridpoint struct

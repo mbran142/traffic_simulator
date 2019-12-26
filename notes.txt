@@ -62,15 +62,9 @@ traffic.cpp
 
 TODO:
 
-~ Create a relationship in which every vehicle has a pointer reference to the intersection its on
-    - split the lane class into a Spanwlane and Endlane class
-        + Inheritence relationship is fine
-    - Spawnlane will have (in addition to its current functionality)
-        + A spawn() function that adds a random car
-        + A queue of cars waiting
-        + Stats in the queue (num vehicles, stats on cars, etc)
-    - Endlane class will have 
-        + A destroy() member function that kills any cars on tiles they're on
-        + Stats on cars that have "left"
-    - Implement the setEnvironment() member function
+~ Print vehicles
+~ Add vehicle spawning
+    - Vehicle spawn rates will depend on the first digit of minutes
+        + i.e., hh:mM:ss (depends on the capital)
+
     

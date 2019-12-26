@@ -16,8 +16,21 @@ Intersection::~Intersection() {
 
 //Runs a traffic simulation
 void Intersection::runSimulation() {
-    //TODO: implement this
-    std::cout << "Testing testing 123" << std::endl;
+
+    long wait;
+
+    std::cout << *this << std::endl;
+
+    while (true) {
+
+        wait = time(NULL);
+
+        this->tick();
+        std::cout << *this << std::endl;
+
+        //wait ~one second
+        do { ; } while (wait == time(NULL));
+    }
 }
 
 //Prints intersection
@@ -71,6 +84,12 @@ std::ostream& operator<<(std::ostream& os, const Intersection& it) {
             /*if (!it.getGrid().isOpen(i, j))
                 quadrant[0][0] = 'C';*/
 
+
+            /*
+            - lanes will have an array of spaces that keep track of vehicles
+            - through the lanes, each vehicle will move
+            */
+
             switch (v) {
                 case TOP_LINE:    quadrant[0][1] = VERTICAL_LINE; break;
                 case BOTTOM_LINE: quadrant[1][1] = VERTICAL_LINE; break;
@@ -100,6 +119,17 @@ std::ostream& operator<<(std::ostream& os, const Intersection& it) {
     return os;
 }
 
+//returns a reference to the grid
+Grid& Intersection::getGrid() const {
+    return *grid;
+}
+
+//Represents a movement one unit of time (~1 second)
+void Intersection::tick() {
+    crossroad->tick();
+    //signalSystem->tick();
+}
+
 //
 char Intersection::codeChar(int code) {
 
@@ -113,9 +143,3 @@ char Intersection::codeChar(int code) {
 
     return 'X';
 }
-
-//returns a reference to the grid
-Grid& Intersection::getGrid() const {
-    return *grid;
-}
-
