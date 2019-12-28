@@ -130,6 +130,11 @@ void Intersection::tick() {
     //signalSystem->tick();
 }
 
+//Gets a lane
+Lane* Intersection::getLane(int in_turn_out, int left_right_middle, int dir) const {
+    return crossroad->getLane(in_turn_out, left_right_middle, dir);
+}
+
 //
 char Intersection::codeChar(int code) {
 

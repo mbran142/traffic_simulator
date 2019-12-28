@@ -60,11 +60,8 @@ traffic.cpp
             > e.g., change rate in which cars want to go to specific roads
     - runSimulation(int ticks)
 
-TODO:
+TODO NEXT
 
-~ Print vehicles
-~ Add vehicle spawning
-    - Vehicle spawn rates will depend on the first digit of minutes
-        + i.e., hh:mM:ss (depends on the capital)
-
-    
+- Once we've connected the lanes, we can finish Vehicle::tick()
+    + Transfer vehicles to lanes if they go past their lane
+    + Fix up all the protected Vehicle member functions that help with controlling speed

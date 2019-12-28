@@ -1,4 +1,6 @@
 #include "vehicle.h"
+#include "intersection.h"
+#include "road.h"
 
 //declaring table of vehicle accelerations, max speeds, and sizes
 const int Vehicle::VCONST[SIZE_VEHICLES][SIZE_CONSTS] = { { C_ACC, C_SPD, C_SIZE },
@@ -6,11 +8,11 @@ const int Vehicle::VCONST[SIZE_VEHICLES][SIZE_CONSTS] = { { C_ACC, C_SPD, C_SIZE
                                                           { M_ACC, M_SPD, M_SIZE },
                                                           { T_ACC, T_SPD, T_SIZE } };
 
-//COMMENT THIS
+//Vehicle constructor
 Vehicle::Vehicle(const Gridpoint& gp, const Intersection* itref, const int consts[SIZE_CONSTS]) :
 ACCELERATION_MAX(consts[ACCELERATION]), SPEED_MAX(consts[SPEED]), VEHICLE_SIZE(consts[SIZE]), position(gp) {
 
-    localEnvironment = itref;
+    itref = itref;
 
     //calculate initial speed
     acceleration = 0;
@@ -18,14 +20,10 @@ ACCELERATION_MAX(consts[ACCELERATION]), SPEED_MAX(consts[SPEED]), VEHICLE_SIZE(c
     while (this->tooFast())
         speed--;
 
-    if (gp.x == 0)
-        direction = EAST;
-    else if (gp.x == 61)
-        direction = WEST;
-    else if (gp.y == 0)
-        direction = SOUTH;
-    else
-        direction = NORTH;
+    for (int i = 0; i < NUM_ROADS; i++)
+        for (int j = 0; j < NUM_LANES; j++)
+            if (gp.x == Road::LANE_LOC[IN_LANE][i][j][START_X] && gp.y == Road::LANE_LOC[IN_LANE][i][j][START_Y])
+                curLane = itref->getLane(IN_LANE, j, i);
 
     destination = STRAIGHT; //REMOVE THIS LATER
     //TO DO: DECIDE DESTINATION (left lane = turn or U-turn, mid = straight, right = straight or right turn)
@@ -50,11 +48,15 @@ void Vehicle::tick() {
     speed = temp + acceleration;
 
     //change position
-    switch (direction) {
+    switch (curLane->getDirection()) {
         case NORTH: position.y += speed; break;
         case EAST : position.x += speed; break;
         case SOUTH: position.y -= speed; break;
         case WEST : position.x -= speed; break;
+        case NORTHEAST: position.y += speed; position.x += speed; break;
+        case SOUTHEAST: position.y -= speed; position.x += speed; break;
+        case SOUTHWEST: position.y -= speed; position.x -= speed; break;
+        case NORTHWEST: position.y += speed; position.x -= speed; break;
         //TODO:
         // 1) if this vehicle passes over the bounds of its lane, find how far over it passed and send it somewhere else
     }
@@ -120,7 +122,12 @@ bool Vehicle::goingToRearEnd() const {
 
 //Returns true if this vehicle is safe to continue at its speed
 bool Vehicle::tooFast() const {
-    return !this->goingToRunRedLight() && !this->goingToRearEnd();
+    
+    if (this->goingToRunRedLight() || this->goingToRearEnd())
+        return true;
+
+    //TODO: add more
+    return false;
 }
 
 //Creates a car

@@ -13,6 +13,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Intersection& intersection);
     Grid& getGrid() const;
     void tick();
+    Lane* getLane(int, int, int) const;
 private:
     Grid* grid;
     Crossroad* crossroad;

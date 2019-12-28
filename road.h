@@ -19,22 +19,25 @@ private:
 
 class Lane {
 public:
-    Lane(int, Gridpoint, Gridpoint, const Intersection*);
+    Lane(int, const Gridpoint&, const Gridpoint&, const Intersection*);
     virtual ~Lane();
     int getDirection() const;
     virtual void tick() = 0;
+    static int determineLaneSize(int, const Gridpoint&, const Gridpoint&);
+    void connectLane(const Lane*, int);
 protected:
-    const int DIRECTION;
+    const int DIRECTION, THIS_LANE_SIZE;
     const Gridpoint START, END;
     const Intersection* itref;
-    Vehicle* space[LANE_SIZE];
+    const Lane* connection[POSSIBLE_TURNS];
+    Vehicle** space;
 };
 
 class Spawnlane : public Lane {
 public:
-    Spawnlane(int, Gridpoint, Gridpoint, const Intersection*);
+    Spawnlane(int, const Gridpoint&, const Gridpoint&, const Intersection*);
     ~Spawnlane();
-    static Gridpoint determineSpawnpoint(Gridpoint, Gridpoint);
+    static Gridpoint determineSpawnpoint(const Gridpoint&, const Gridpoint&);
     static bool decideToSpawnVehicle();
     bool backIsOpen() const;
     int backSpacesOpen() const;
@@ -47,21 +50,30 @@ private:
 
 class Endlane : public Lane {
 public:
-    Endlane(int dir, Gridpoint start, Gridpoint end, const Intersection* itref);
+    Endlane(int, const Gridpoint&, const Gridpoint&, const Intersection*);
     ~Endlane();
-    static Gridpoint determineEndpoint(Gridpoint, Gridpoint);
+    static Gridpoint determineEndpoint(const Gridpoint&, const Gridpoint&);
     void tick();
 private:
     const Gridpoint ENDPOINT;
-    //MAYBE ADD SOME STATISTICS HERE
+};
+
+class IntersectionLane : public Lane {
+public:
+    IntersectionLane(int, const Gridpoint&, const Gridpoint&, const Intersection*);
+    ~IntersectionLane();
+    void tick();
+private:
 };
 
 class Road {
 public:
     const static int LANE_LOC[IN_OUT_COUNT][NUM_ROADS][NUM_LANES][START_END_COUNT];
+    const static int INTERSECTION_LANE_LOC[INTERSECTION_LANE_SIZE][NUM_ROADS][START_END_COUNT];
     Road(int, bool, const Intersection*);
     ~Road();
     void tick();
+    Lane* getLane(int) const;
 private:
     Lane* lane[NUM_LANES_PER_ROAD];
     const int DIRECTION;
@@ -72,8 +84,10 @@ public:
     Crossroad(const Intersection*);
     ~Crossroad();
     void tick();
+    Lane* getLane(int, int, int) const;
 private:
     Road* inRoad[NUM_ROADS];
+    Lane* interLane[NUM_ROADS][INTERSECTION_LANE_SIZE]; //Ne Se Sw Ne OR N E S W -> left, right, straight_L, straight_R
     Road* outRoad[NUM_ROADS];
 };
 

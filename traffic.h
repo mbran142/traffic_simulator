@@ -41,6 +41,7 @@ enum color { GREEN, YELLOW, RED };
 #define LEFT 0
 #define MIDDLE 1
 #define RIGHT 2
+#define LEFT_RIGHT_COUNT 2
 
 #define NO_LINE 0
 #define TOP_LINE 1
@@ -66,10 +67,20 @@ enum color { GREEN, YELLOW, RED };
 #define EAST 1
 #define SOUTH 2
 #define WEST 3
+#define NORTHEAST 4
+#define SOUTHEAST 5
+#define SOUTHWEST 6
+#define NORTHWEST 7
 
 #define NUM_SIGNALS_PER_SET 3
 #define NUM_SIGNAL_SETS 4
 #define NUM_LANES_PER_ROAD 3
+
+#define CR_LEFT 0
+#define CR_RIGHT 1
+#define CR_STRAIGHT_L 2
+#define CR_STRAIGHT_R 3
+#define INTERSECTION_LANE_SIZE 4
 
 //vehicle.h
 
@@ -90,6 +101,7 @@ enum color { GREEN, YELLOW, RED };
 #define LEFT_TURN 1
 #define RIGHT_TURN 2
 #define U_TURN 3
+#define POSSIBLE_TURNS 4
 
 //car
 #define C_ACC 2
@@ -132,6 +144,9 @@ struct Gridpoint {
         this->y = g.y;
         return *this;
     }
+    bool operator==(const Gridpoint& g) {
+        return x == g.x && y == g.y;
+    }
 };
 
 //checks whether integer 'search' exists in sorted array arr
@@ -151,6 +166,23 @@ inline bool binarySearch(int search, const int arr[], int size) {
     }
 
     return false;
+}
+
+//roates a direction
+inline int rotateDirection(int direction, int rotate) {
+
+    const int NUM_DIRECTIONS = 4,
+              NUM_ROTATIONS = 3;
+    
+    const static int TABLE[NUM_DIRECTIONS][NUM_ROTATIONS] =
+    { /*  Left       Right      U-turn */
+        { NORTHWEST, NORTHEAST, SOUTH }, //north
+        { NORTHEAST, SOUTHEAST, WEST  }, //east
+        { SOUTHEAST, SOUTHWEST, NORTH }, //south
+        { SOUTHWEST, NORTHWEST, EAST  }  //west
+    };
+
+    return TABLE[direction][rotate];
 }
 
 #endif

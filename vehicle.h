@@ -5,6 +5,7 @@
 
 class Intersection;
 struct Gridpoint;
+class Lane;
 
 class Vehicle {
 public:
@@ -19,8 +20,9 @@ protected:
     const int SPEED_MAX;
     const int VEHICLE_SIZE;
     const int TURN_SPEED = SPEED_MAX / 2;
-    const Intersection* localEnvironment;
-    int acceleration, speed, direction, destination;
+    const Intersection* itref;
+    int acceleration, speed, destination;
+    Lane* curLane;
     Gridpoint position;
     bool checkSignal() const;
     bool goingToRunRedLight() const;
