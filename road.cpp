@@ -67,16 +67,19 @@ Gridpoint Grid::drawRoadLine(int i, int j) {
 }
 
 int Grid::lineStatus(int i, int j) {
-    int status = EMPTY;
     if (binarySearch(j, (const int[]){26, 27, 34, 35}, 4) && (i == 25 || i == 35))
-        status = BOTH_LINES;
-    else if ((j > 0 && j < 26) || (j > 35 && j < 62)) {
+        return BOTH_LINES;
+    if ((j > 0 && j < 26) || (j > 35 && j < 62)) {
         if (binarySearch(i, (const int[]){27, 30, 33}, 3))
-            status = BOTH_LINES;
-        else if (binarySearch(i, (const int[]){28, 29, 31, 32}, 4))
-            status = j < 26 ? BOTTOM_LINE : TOP_LINE;
+            return BOTH_LINES;
+        if (binarySearch(i, (const int[]){28, 29, 31, 32}, 4))
+            return j < 26 ? BOTTOM_LINE : TOP_LINE;
     }
-    return status;
+    if ((j == 25 || j == 33) && (i == 25 || i == 35))
+        return BOTTOM_LINE;
+    if (j == 35 && (i == 27 || i == 33))
+        return BOTTOM_LINE;
+    return EMPTY;
 }
 
 //Creates a lane on a road

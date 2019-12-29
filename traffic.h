@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <sstream>
 #include <cstdlib>
 #include <ctime>
 
@@ -45,9 +46,9 @@ enum color { GREEN, YELLOW, RED };
 
 #define NO_LINE 0
 #define TOP_LINE 1
-#define RIGHT_LINE 1
+#define LEFT_LINE 1
 #define BOTTOM_LINE 2
-#define LEFT_LINE 2
+#define RIGHT_LINE 2
 #define HORIZONTAL_LINE 1
 #define VERTICAL_LINE 2
 #define BOTH_LINES 3

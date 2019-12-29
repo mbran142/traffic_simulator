@@ -18,7 +18,7 @@ private:
     Grid* grid;
     Crossroad* crossroad;
     SignalSystem* signalSystem;
-    static char codeChar(int);
+    static std::string codeChar(int[]);
 };
 
 #endif

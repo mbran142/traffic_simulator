@@ -36,7 +36,7 @@ void Intersection::runSimulation() {
 //Prints intersection
 std::ostream& operator<<(std::ostream& os, const Intersection& it) {
 
-    std::string top, bot;
+    std::stringstream top, bot;
     //0 = none | 1 = top / right single | 2 = bot / left single | 3 = double
     int quadrant[2][2];
     Gridpoint status;
@@ -44,30 +44,26 @@ std::ostream& operator<<(std::ostream& os, const Intersection& it) {
 
     //print top indeces
     if (DEBUG) {
-        std::string botLine;
+        top << "  ";
+        bot << "  ";
         for (int i = PRINT_BORDER; i < PRINT_SIZE; i++) {
-            top.push_back(i % 10 ? ' ' : i / 10 + '0');
-            top.push_back(' ');
-            bot.push_back(i % 10 + '0');
-            bot.push_back(' ');
-            botLine.push_back(i == PRINT_BORDER ? '+' : '-');
-            botLine.push_back('-');
+            top << ' ' << i << ' ';
+            bot << (i == PRINT_BORDER ? '+' : '-') << "---";
         }
-        std::cout << "  " << top << std::endl << "  "<< bot << std::endl << "  " << botLine << std::endl;;
+        std::cout << top.str() << std::endl << bot.str() << std::endl;
     }
 
     //y axis
     for (int j = PRINT_BORDER; j < PRINT_SIZE; j++) {
 
-        top.clear();
-        bot.clear();
+        //clear stringstreams
+        top.str(std::string());
+        bot.str(std::string());
 
         //print left indeces
         if (DEBUG) {
-            top.push_back(j / 10 + '0');
-            top.push_back(j % 10 + '0');
-            top.push_back('|');
-            bot += "  |";
+            top << j << '|';
+            bot << "  |";
         }
 
         //x axis
@@ -104,13 +100,11 @@ std::ostream& operator<<(std::ostream& os, const Intersection& it) {
                                   quadrant[1][0] = HORIZONTAL_LINE; break;
             }
                 
-            top.push_back(Intersection::codeChar(quadrant[0][0]));
-            top.push_back(Intersection::codeChar(quadrant[0][1]));
-            bot.push_back(Intersection::codeChar(quadrant[1][0]));
-            bot.push_back(Intersection::codeChar(quadrant[1][1]));
+            top << Intersection::codeChar(quadrant[0]); 
+            bot << Intersection::codeChar(quadrant[1]);
         }
 
-        std::cout << top << std::endl << bot;
+        std::cout << top.str() << std::endl << bot.str();
 
         if (j != PRINT_SIZE - 1)
             std::cout << std::endl;
@@ -135,16 +129,20 @@ Lane* Intersection::getLane(int in_turn_out, int left_right_middle, int dir) con
     return crossroad->getLane(in_turn_out, left_right_middle, dir);
 }
 
-//
-char Intersection::codeChar(int code) {
+//Converts the grid into printable characters
+std::string Intersection::codeChar(int code[]) {
 
-    switch (code) {
-        case EMPTY           : return ' ';
-        case HORIZONTAL_LINE : return '-';
-        case VERTICAL_LINE   : return '|';
-        case BOTH_LINES      : return '+';
-        //MORE DEPENDING ON VEHICLES AND LIGHTS
+    std::stringstream out;
+
+    for (int i = 0; i < 2; i++) {
+        switch (code[i]) {
+            case EMPTY           : out << "  "; break;
+            case HORIZONTAL_LINE : out << "--"; break;
+            case VERTICAL_LINE   : out << " |"; break;
+            case BOTH_LINES      : out << " +"; break;
+            //MORE DEPENDING ON VEHICLES AND LIGHTS
+        }
     }
 
-    return 'X';
+    return out.str();
 }
