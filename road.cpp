@@ -1,5 +1,6 @@
 #include "road.h"
 #include "vehicle.h"
+#include "intersection.h"
 
 extern int totalTicks;
 
@@ -61,6 +62,11 @@ bool Grid::isOpen(int i, int j) const {
     return grid[i][j] == -1;
 }
 
+//Gets a space open or closed
+void Grid::setSpace(const Gridpoint& gp, bool open) {
+    grid[gp.x][gp.y] = open;
+}
+
 //Decides which lines to draw. Returns in a 2-digit decimal value of vh
 Gridpoint Grid::drawRoadLine(int i, int j) {
     return Gridpoint(Grid::lineStatus(i, j), Grid::lineStatus(j, i));
@@ -94,6 +100,8 @@ Lane::Lane(int dir, const Gridpoint& start, const Gridpoint& end, const Intersec
 
     for (int i = 0; i < POSSIBLE_TURNS; i++)
         connection[i] = NULL;
+
+    prevLane = NULL;
 }
 
 //Default lane destructor
@@ -126,8 +134,34 @@ int Lane::determineLaneSize(int dir, const Gridpoint& s, const Gridpoint& e) {
 }
 
 //Connects one lane to this one
-void Lane::connectLane(const Lane* toConnect, int turnDirection) {
+void Lane::connectLane(Lane* toConnect, int turnDirection) {
     connection[turnDirection] = toConnect;
+    toConnect->prevLane = this;
+}
+
+//gets the next lane
+Lane* Lane::getNextLane(int index) const {
+    return connection[index];
+}
+
+//Gets the lane position (i.e., left, middle, right, turn)
+int Lane::getPosition() {
+    if (connection[LEFT])
+        return LEFT;
+    else if (connection[RIGHT])
+        return RIGHT;
+    else
+        return MIDDLE;
+}
+
+//Gets the length of the lane
+int Lane::getSize() const {
+    return THIS_LANE_SIZE;
+}
+
+//Returns the start position of this lane
+const Gridpoint& Lane::getStart() const {
+    return START;
 }
 
 //Create new spawnlane
@@ -188,14 +222,20 @@ bool Spawnlane::decideToSpawnVehicle() {
 
 //Checks if there is space for a car to be removed from the queue
 bool Spawnlane::backIsOpen() const {
-    //check if there is room for another car to be spawned if there's one in the spawn queue
-    return true;
+    return itref->getGrid().isOpen(SPAWNPOINT.x, SPAWNPOINT.y);
 }
 
 //Checks how many spaces are open in front of a newly spawned car
 int Spawnlane::backSpacesOpen() const {
-    //check how many spaces are open in the back of the lane
-    return 0;
+    int spaces = 0;
+    Gridpoint pos = SPAWNPOINT;
+    while (itref->getGrid().isOpen(pos.x, pos.y)) {
+        spaces++;
+        pos.move(DIRECTION, 1, true);
+        if (pos == END)
+            break;
+    }
+    return spaces;
 }
 
 //Ticks the road one unit in time
@@ -211,6 +251,11 @@ void Spawnlane::tick() {
             i -= space[i]->getSize() - 1;
         }
     }
+}
+
+//Gets the start of the lane
+const Gridpoint& Spawnlane::getStart() const {
+    return SPAWNPOINT;
 }
 
 //Adds a new vehicle to the queue
@@ -233,6 +278,20 @@ Gridpoint Endlane::determineEndpoint(const Gridpoint& start, const Gridpoint& en
 //Simulates one unit of time
 void Endlane::tick() {
 
+    for (int i = THIS_LANE_SIZE - 1; i >= 0; --i) {
+        //tick each vehicle
+        if (space[i] != NULL) {
+            space[i]->tick();
+            i -= space[i]->getSize() - 1;
+        }
+    }
+
+    //TODO: destroy any vehicles passed the endpoint
+}
+
+//Gets the start of the lane
+const Gridpoint& Endlane::getStart() const {
+    return START;
 }
 
 //Turnlane constructor
@@ -250,6 +309,11 @@ void IntersectionLane::tick() {
             i -= space[i]->getSize() - 1;
         }
     }
+}
+
+//Gets the start of the lane
+const Gridpoint& IntersectionLane::getStart() const {
+    return START;
 }
 
 //Road constructor

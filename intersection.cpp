@@ -14,14 +14,14 @@ Intersection::~Intersection() {
     //delete signalSystem;
 }
 
-//Runs a traffic simulation
-void Intersection::runSimulation() {
+//Runs a traffic simulation for a certain amount of ticks
+void Intersection::runSimulation(int ticks) {
 
     long wait;
 
     std::cout << *this << std::endl;
 
-    while (true) {
+    for (int i = 0; i < ticks; i++) {
 
         wait = time(NULL);
 
@@ -33,10 +33,10 @@ void Intersection::runSimulation() {
     }
 }
 
-//Prints intersection
-std::ostream& operator<<(std::ostream& os, const Intersection& it) {
+//Creates the string to print for an intersection print
+std::string Intersection::createIntersectionString() const {
 
-    std::stringstream top, bot;
+    std::stringstream top, bot, out;
     //0 = none | 1 = top / right single | 2 = bot / left single | 3 = double
     int quadrant[2][2];
     Gridpoint status;
@@ -104,12 +104,18 @@ std::ostream& operator<<(std::ostream& os, const Intersection& it) {
             bot << Intersection::codeChar(quadrant[1]);
         }
 
-        std::cout << top.str() << std::endl << bot.str();
+        out << top.str() << '\n' << bot.str();
 
         if (j != PRINT_SIZE - 1)
-            std::cout << std::endl;
+            out << '\n';
     }
 
+    return out.str();
+}
+
+//Prints intersection
+std::ostream& operator<<(std::ostream& os, const Intersection& it) {
+    os << it.createIntersectionString() << std::endl;
     return os;
 }
 

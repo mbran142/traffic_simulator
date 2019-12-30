@@ -12,7 +12,21 @@ const int Vehicle::VCONST[SIZE_VEHICLES][SIZE_CONSTS] = { { C_ACC, C_SPD, C_SIZE
 Vehicle::Vehicle(const Gridpoint& gp, const Intersection* itref, const int consts[SIZE_CONSTS]) :
 ACCELERATION_MAX(consts[ACCELERATION]), SPEED_MAX(consts[SPEED]), VEHICLE_SIZE(consts[SIZE]), position(gp) {
 
-    itref = itref;
+    this->itref = itref;
+
+    //find the lane this Vehicle was spawned in
+    for (int i = 0; i < NUM_ROADS; i++)
+        for (int j = 0; j < NUM_LANES; j++)
+            if (gp.x == Road::LANE_LOC[IN_LANE][i][j][START_X] && gp.y == Road::LANE_LOC[IN_LANE][i][j][START_Y])
+                curLane = itref->getLane(IN_LANE, j, i);
+
+    //Set up positions and such
+    distanceLeftInLane = curLane->getSize();
+    buttLane = curLane;
+    position = curLane->getStart();
+    buttPosition = position;
+    buttPosition.move(curLane->getDirection(), VEHICLE_SIZE - 1, false);
+    buttInLane = 0;
 
     //calculate initial speed
     acceleration = 0;
@@ -20,20 +34,21 @@ ACCELERATION_MAX(consts[ACCELERATION]), SPEED_MAX(consts[SPEED]), VEHICLE_SIZE(c
     while (this->tooFast())
         speed--;
 
-    for (int i = 0; i < NUM_ROADS; i++)
-        for (int j = 0; j < NUM_LANES; j++)
-            if (gp.x == Road::LANE_LOC[IN_LANE][i][j][START_X] && gp.y == Road::LANE_LOC[IN_LANE][i][j][START_Y])
-                curLane = itref->getLane(IN_LANE, j, i);
-
-    destination = STRAIGHT; //REMOVE THIS LATER
-    //TO DO: DECIDE DESTINATION (left lane = turn or U-turn, mid = straight, right = straight or right turn)
-    //maybe decide this in the constructor, maybe not
+    //decide which direction to turn
+    {
+        int rng = rand() % 100;
+        switch (curLane->getPosition()) {
+            case LEFT  : destination = rng < u_turn_rate ? U_TURN : LEFT_TURN; break;
+            case MIDDLE: destination = STRAIGHT; break;
+            case RIGHT : destination = rng < right_turn_rate ? RIGHT_TURN : STRAIGHT; break;
+        }
+    }
 };
 
 //Simulates one unit of time for the vehicle
 void Vehicle::tick() {
 
-    int temp;
+    int temp, toTravel;
 
     //change acceleration
     temp = speed;
@@ -47,26 +62,50 @@ void Vehicle::tick() {
     //change speed;
     speed = temp + acceleration;
 
+    if (speed > distanceLeftInLane) {
+        toTravel = speed - distanceLeftInLane + 1;
+        buttInLane = distanceLeftInLane + SIZE - speed;
+        curLane = curLane->getNextLane(destination);
+        position = curLane->getStart();
+        distanceLeftInLane = curLane->getSize();
+    }
+    else toTravel = speed;
+
     //change position
     switch (curLane->getDirection()) {
-        case NORTH: position.y += speed; break;
-        case EAST : position.x += speed; break;
-        case SOUTH: position.y -= speed; break;
-        case WEST : position.x -= speed; break;
-        case NORTHEAST: position.y += speed; position.x += speed; break;
-        case SOUTHEAST: position.y -= speed; position.x += speed; break;
-        case SOUTHWEST: position.y -= speed; position.x -= speed; break;
-        case NORTHWEST: position.y += speed; position.x -= speed; break;
-        //TODO:
-        // 1) if this vehicle passes over the bounds of its lane, find how far over it passed and send it somewhere else
+        case NORTH: position.y += toTravel; break;
+        case EAST : position.x += toTravel; break;
+        case SOUTH: position.y -= toTravel; break;
+        case WEST : position.x -= toTravel; break;
+        case NORTHEAST: position.y += toTravel; position.x += toTravel; break;
+        case SOUTHEAST: position.y -= toTravel; position.x += toTravel; break;
+        case SOUTHWEST: position.y -= toTravel; position.x -= toTravel; break;
+        case NORTHWEST: position.y += toTravel; position.x -= toTravel; break;
+    }
+    distanceLeftInLane -= toTravel;
+
+    //update grid
+    Gridpoint gridUpdator = position;
+    for (int i = 0; i < speed; i++) {
+
+        //modify front and back of grid
+        itref->getGrid().setSpace(gridUpdator, true);
+        itref->getGrid().setSpace(buttPosition, false);
+
+        //update positions
+        gridUpdator.move(curLane->getDirection(), 1, false);
+        buttPosition.move(buttLane->getDirection(), 1, true);
+        if (buttInLane) {
+            buttInLane--;
+            if (!buttInLane)
+                buttLane = curLane;
+        }
     }
 
     /*
     STUFF NEXT
     - implement Vehicle::tooFast()
         + decide how Vehicle will be able to check cars in front of it and red lights and stuff
-    - figure out how vehicles will go from lanes to the intersection to lanes
-        + I'll probably add NE, NW, SE, SW directions and itll go diagonally through the intersection
     */
 }
 

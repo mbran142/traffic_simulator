@@ -9,7 +9,8 @@ class Intersection {
 public:
     Intersection();
     ~Intersection();
-    void runSimulation();
+    void runSimulation(int);
+    std::string createIntersectionString() const;
     friend std::ostream& operator<<(std::ostream& os, const Intersection& intersection);
     Grid& getGrid() const;
     void tick();

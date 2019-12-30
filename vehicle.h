@@ -21,9 +21,9 @@ protected:
     const int VEHICLE_SIZE;
     const int TURN_SPEED = SPEED_MAX / 2;
     const Intersection* itref;
-    int acceleration, speed, destination;
-    Lane* curLane;
-    Gridpoint position;
+    int acceleration, speed, destination, distanceLeftInLane, buttInLane;
+    Lane *curLane, *buttLane;
+    Gridpoint position, buttPosition;
     bool checkSignal() const;
     bool goingToRunRedLight() const;
     bool goingToRearEnd() const;

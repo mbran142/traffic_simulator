@@ -11,8 +11,7 @@ int main() {
     totalTicks = 0;
 
     Intersection intersection;
-
-    std::cout << intersection << std::endl;
+    intersection.runSimulation(10000);
 
     return 0;
 }

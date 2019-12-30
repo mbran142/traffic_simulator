@@ -11,6 +11,7 @@ class Grid {
 public:
     Grid();
     bool isOpen(int, int) const;
+    void setSpace(const Gridpoint&, bool);
     static Gridpoint drawRoadLine(int, int);
 private:
     int grid[GRID_SIZE][GRID_SIZE];
@@ -24,12 +25,17 @@ public:
     int getDirection() const;
     virtual void tick() = 0;
     static int determineLaneSize(int, const Gridpoint&, const Gridpoint&);
-    void connectLane(const Lane*, int);
+    void connectLane(Lane*, int);
+    Lane* getNextLane(int) const;
+    int getPosition();
+    int getSize() const;
+    virtual const Gridpoint& getStart() const = 0;
+    const Lane* prevLane;
 protected:
     const int DIRECTION, THIS_LANE_SIZE;
     const Gridpoint START, END;
     const Intersection* itref;
-    const Lane* connection[POSSIBLE_TURNS];
+    Lane* connection[POSSIBLE_TURNS];
     Vehicle** space;
 };
 
@@ -42,6 +48,7 @@ public:
     bool backIsOpen() const;
     int backSpacesOpen() const;
     void tick();
+    const Gridpoint& getStart() const;
 private:
     const Gridpoint SPAWNPOINT;
     std::queue<Vehicle*>* vehicleQueue;
@@ -54,6 +61,7 @@ public:
     ~Endlane();
     static Gridpoint determineEndpoint(const Gridpoint&, const Gridpoint&);
     void tick();
+    const Gridpoint& getStart() const;
 private:
     const Gridpoint ENDPOINT;
 };
@@ -63,6 +71,7 @@ public:
     IntersectionLane(int, const Gridpoint&, const Gridpoint&, const Intersection*);
     ~IntersectionLane();
     void tick();
+    const Gridpoint& getStart() const;
 private:
 };
 

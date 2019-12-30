@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define DEBUG true
+#define DEBUG false
 
 //RATES OF OCCURENCES
 
@@ -18,7 +18,8 @@ const int car_rate = 91,
           truck_rate = 2;
 
 //rates of turning right in the rightmost lane
-const int right_turn_rate = 40;
+const int right_turn_rate = 50,
+          u_turn_rate = 25;
 
 //rates of cars spawning
 const int high_rate = 15,
@@ -147,6 +148,25 @@ struct Gridpoint {
     }
     bool operator==(const Gridpoint& g) {
         return x == g.x && y == g.y;
+    }
+    void move(int dir, int dist, bool forward) {
+        int x, y;
+        switch (dir) {
+            case NORTH: x = 0; y = dist;
+            case EAST : x = dist; y = 0;
+            case SOUTH: x = 0; y = -dist;
+            case WEST : x = -dist; y = 0;
+            case NORTHEAST: x = dist; y = dist;
+            case SOUTHEAST: x = dist; y = -dist;
+            case SOUTHWEST: x = -dist; y = -dist;
+            case NORTHWEST: x = -dist; y = dist;
+        }
+        if (!forward) {
+            x *= -1;
+            y *= -1;
+        }
+        this->x += x;
+        this->y += y;
     }
 };
 
