@@ -62,6 +62,6 @@ traffic.cpp
 
 TODO NEXT
 
-- Once we've connected the lanes, we can finish Vehicle::tick()
+- Once we've connectedmake the lanes, we can finish Vehicle::tick()
     + Transfer vehicles to lanes if they go past their lane
     + Fix up all the protected Vehicle member functions that help with controlling speed

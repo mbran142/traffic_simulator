@@ -54,12 +54,17 @@ const int Road::INTERSECTION_LANE_LOC[INTERSECTION_LANE_SIZE][NUM_ROADS][START_E
 Grid::Grid() {
     for (int i = 0; i < GRID_SIZE; i++)
         for (int j = 0; j < GRID_SIZE; j++)
-            grid[i][j] = EMPTY;
+            grid[i][j] = false;
+}
+
+//Checks if a x,y position is open
+bool Grid::isOpen(int i, int j) const {
+    return !grid[i][j];
 }
 
 //Checks if this gridspace is open
-bool Grid::isOpen(int i, int j) const {
-    return grid[i][j] == -1;
+bool Grid::isOpen(const Gridpoint& g) const {
+    return !grid[g.x][g.y];
 }
 
 //Gets a space open or closed
@@ -165,35 +170,31 @@ const Gridpoint& Lane::getStart() const {
 }
 
 //Create new spawnlane
-Spawnlane::Spawnlane(int dir, const Gridpoint& start, const Gridpoint& end, const Intersection* itref) : Lane(dir, start, end, itref), SPAWNPOINT(Spawnlane::determineSpawnpoint(start, end)) {
-    vehicleQueue = new std::queue<Vehicle*>();
-}
+Spawnlane::Spawnlane(int dir, const Gridpoint& start, const Gridpoint& end, const Intersection* itref) : Lane(dir, start, end, itref), SPAWNPOINT(Spawnlane::determineSpawnpoint(start, end)) { }
 
 //Deallocate resources used by spawnlane
-Spawnlane::~Spawnlane() {
-
-    //free contents of queue
-    while (!vehicleQueue->empty()) {
-        delete vehicleQueue->front();
-        vehicleQueue->pop();
-    }
-
-    //free queue
-    delete vehicleQueue;
-}
+Spawnlane::~Spawnlane() { }
 
 //Determines the point at which vehicles spawn in a lane
 Gridpoint Spawnlane::determineSpawnpoint(const Gridpoint& start, const Gridpoint& end) {
 
     int x, y;
 
+    //vertical
     if (start.x == end.x) {
         x = start.x;
-        y = start.y > end.y ? start.y + T_SIZE : start.y - T_SIZE;
+        if (start.y > end.y) //north
+            y = start.y - T_SIZE + 1;
+        else //south
+            y = start.y + T_SIZE - 1; 
     }
+    //horizontal
     else {
         y = start.y;
-        x = start.x + (start.x > end.y ? T_SIZE : T_SIZE * -1);
+        if (start.x < end.x) //east
+            x = start.x + T_SIZE - 1;
+        else //west
+            x = start.x - T_SIZE + 1;
     }
 
     return Gridpoint(x, y);
@@ -222,14 +223,14 @@ bool Spawnlane::decideToSpawnVehicle() {
 
 //Checks if there is space for a car to be removed from the queue
 bool Spawnlane::backIsOpen() const {
-    return itref->getGrid().isOpen(SPAWNPOINT.x, SPAWNPOINT.y);
+    return itref->getGrid().isOpen(SPAWNPOINT);
 }
 
 //Checks how many spaces are open in front of a newly spawned car
 int Spawnlane::backSpacesOpen() const {
     int spaces = 0;
     Gridpoint pos = SPAWNPOINT;
-    while (itref->getGrid().isOpen(pos.x, pos.y)) {
+    while (itref->getGrid().isOpen(pos)) {
         spaces++;
         pos.move(DIRECTION, 1, true);
         if (pos == END)
@@ -241,7 +242,7 @@ int Spawnlane::backSpacesOpen() const {
 //Ticks the road one unit in time
 void Spawnlane::tick() {
 
-    if (Spawnlane::decideToSpawnVehicle())
+    if (backSpacesOpen() > 1 && Spawnlane::decideToSpawnVehicle())
         this->spawnVehicle();
 
     for (int i = THIS_LANE_SIZE - 1; i >= 0; --i) {
@@ -258,9 +259,17 @@ const Gridpoint& Spawnlane::getStart() const {
     return SPAWNPOINT;
 }
 
-//Adds a new vehicle to the queue
+//Adds a new vehicle to the lane
 void Spawnlane::spawnVehicle() {
-    vehicleQueue->push(Vehicle::generateRandomVehicle(SPAWNPOINT, itref));
+
+    Vehicle* v = Vehicle::generateRandomVehicle(this, itref);
+    Gridpoint position = SPAWNPOINT;
+    
+    for (int i = 0; i < v->getSize(); i++) {
+        space[LANE_SIZE - T_SIZE + i] = v;
+        itref->getGrid().setSpace(position, true);
+        position.move(DIRECTION, 1, false);
+    }
 }
 
 //Default constructor for endlane
@@ -271,8 +280,8 @@ Endlane::~Endlane() { }
 
 //Determines the despawn point for cars on an endlane
 Gridpoint Endlane::determineEndpoint(const Gridpoint& start, const Gridpoint& end) {
-    return end;
     //TODO: consider changing this
+    return end;
 }
 
 //Simulates one unit of time
@@ -387,9 +396,9 @@ Crossroad::Crossroad(const Intersection* itref) {
 Crossroad::~Crossroad() {
     for (int i = 0; i < NUM_ROADS; i++) {
         delete inRoad[i];
-        delete outRoad[i];
         for (int j = 0; j < INTERSECTION_LANE_SIZE; j++)
             delete interLane[i][j];
+        delete outRoad[i];
     }
 }
 
@@ -397,9 +406,9 @@ Crossroad::~Crossroad() {
 void Crossroad::tick() {
     for (int i = 0; i < NUM_ROADS; i++) {
         outRoad[i]->tick();
-        inRoad[i]->tick();
         for (int j = 0; j < INTERSECTION_LANE_SIZE; j++)
             interLane[i][j]->tick();
+        inRoad[i]->tick();
     }
 }
 

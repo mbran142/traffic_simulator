@@ -10,10 +10,10 @@ class Lane;
 class Vehicle {
 public:
     const static int VCONST[SIZE_VEHICLES][SIZE_CONSTS];
-    Vehicle(const Gridpoint& gp, const Intersection*, const int[SIZE_CONSTS]);
+    Vehicle(Lane*, const Intersection*, const int[SIZE_CONSTS]);
     void tick();
     int getSize() const;
-    static Vehicle* generateRandomVehicle(Gridpoint, const Intersection*);
+    static Vehicle* generateRandomVehicle(Lane*, const Intersection*);
 protected:
     const int DECELERATION = ACCELERATION_MAX;
     const int ACCELERATION_MAX;
@@ -32,22 +32,22 @@ protected:
 
 class Car: public Vehicle {
 public:
-    Car(const Gridpoint&, const Intersection*);
+    Car(Lane*, const Intersection*);
 };
 
 class Van: public Vehicle {
 public:
-    Van(const Gridpoint&, const Intersection*);
+    Van(Lane*, const Intersection*);
 };
 
 class Motercycle: public Vehicle {
 public:
-    Motercycle(const Gridpoint&, const Intersection*);
+    Motercycle(Lane*, const Intersection*);
 };
 
 class Truck: public Vehicle {
 public:
-    Truck(const Gridpoint&, const Intersection*);
+    Truck(Lane*, const Intersection*);
 };
 
 #endif

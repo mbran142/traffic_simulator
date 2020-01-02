@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define DEBUG false
+#define DEBUG true
 
 //RATES OF OCCURENCES
 
@@ -60,7 +60,11 @@ enum color { GREEN, YELLOW, RED };
 
 //grid size
 #define GRID_SIZE (LANE_SIZE * 2 + INTERSECTION_SIZE)
-#define PRINT_BORDER 16
+#if DEBUG == false
+    #define PRINT_BORDER 16
+#else
+    #define PRINT_BORDER (T_SIZE)
+#endif
 #define PRINT_SIZE (GRID_SIZE - PRINT_BORDER)
 
 //roads
@@ -93,6 +97,7 @@ enum color { GREEN, YELLOW, RED };
 #define MOTERCYCLE 2
 #define TRUCK 3
 #define EMPTY -1
+#define VEHICLE_PRESENT 10
 
 #define SIZE_CONSTS 3
 #define ACCELERATION 0
@@ -152,14 +157,15 @@ struct Gridpoint {
     void move(int dir, int dist, bool forward) {
         int x, y;
         switch (dir) {
-            case NORTH: x = 0; y = dist;
-            case EAST : x = dist; y = 0;
-            case SOUTH: x = 0; y = -dist;
-            case WEST : x = -dist; y = 0;
-            case NORTHEAST: x = dist; y = dist;
-            case SOUTHEAST: x = dist; y = -dist;
-            case SOUTHWEST: x = -dist; y = -dist;
-            case NORTHWEST: x = -dist; y = dist;
+            case NORTH: x = 0; y = -dist; break;
+            case EAST : x = dist; y = 0; break;
+            case SOUTH: x = 0; y = dist; break;
+            case WEST : x = -dist; y = 0; break;
+            case NORTHEAST: x = dist; y = -dist; break;
+            case SOUTHEAST: x = dist; y = dist; break;
+            case SOUTHWEST: x = -dist; y = dist; break;
+            case NORTHWEST: x = -dist; y = -dist; break;
+            default: throw "Error: Gridpoint::move() given invalid direction";
         }
         if (!forward) {
             x *= -1;

@@ -47,7 +47,7 @@ std::string Intersection::createIntersectionString() const {
         top << "  ";
         bot << "  ";
         for (int i = PRINT_BORDER; i < PRINT_SIZE; i++) {
-            top << ' ' << i << ' ';
+            top << ' ' << i / 10 << i % 10 << ' ';
             bot << (i == PRINT_BORDER ? '+' : '-') << "---";
         }
         std::cout << top.str() << std::endl << bot.str() << std::endl;
@@ -62,7 +62,7 @@ std::string Intersection::createIntersectionString() const {
 
         //print left indeces
         if (DEBUG) {
-            top << j << '|';
+            top << j / 10 << j % 10 << '|';
             bot << "  |";
         }
 
@@ -77,14 +77,8 @@ std::string Intersection::createIntersectionString() const {
             v = status.x;
             h = status.y;
 
-            /*if (!it.getGrid().isOpen(i, j))
-                quadrant[0][0] = 'C';*/
-
-
-            /*
-            - lanes will have an array of spaces that keep track of vehicles
-            - through the lanes, each vehicle will move
-            */
+            if (!grid->isOpen(i, j))
+                quadrant[0][0] = VEHICLE_PRESENT;
 
             switch (v) {
                 case TOP_LINE:    quadrant[0][1] = VERTICAL_LINE; break;
@@ -146,6 +140,7 @@ std::string Intersection::codeChar(int code[]) {
             case HORIZONTAL_LINE : out << "--"; break;
             case VERTICAL_LINE   : out << " |"; break;
             case BOTH_LINES      : out << " +"; break;
+            case VEHICLE_PRESENT : out << "# "; break;
             //MORE DEPENDING ON VEHICLES AND LIGHTS
         }
     }

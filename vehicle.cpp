@@ -9,21 +9,15 @@ const int Vehicle::VCONST[SIZE_VEHICLES][SIZE_CONSTS] = { { C_ACC, C_SPD, C_SIZE
                                                           { T_ACC, T_SPD, T_SIZE } };
 
 //Vehicle constructor
-Vehicle::Vehicle(const Gridpoint& gp, const Intersection* itref, const int consts[SIZE_CONSTS]) :
-ACCELERATION_MAX(consts[ACCELERATION]), SPEED_MAX(consts[SPEED]), VEHICLE_SIZE(consts[SIZE]), position(gp) {
+Vehicle::Vehicle(Lane* lane, const Intersection* itref, const int consts[SIZE_CONSTS]) :
+ACCELERATION_MAX(consts[ACCELERATION]), SPEED_MAX(consts[SPEED]), VEHICLE_SIZE(consts[SIZE]), position(lane->getStart()) {
 
     this->itref = itref;
-
-    //find the lane this Vehicle was spawned in
-    for (int i = 0; i < NUM_ROADS; i++)
-        for (int j = 0; j < NUM_LANES; j++)
-            if (gp.x == Road::LANE_LOC[IN_LANE][i][j][START_X] && gp.y == Road::LANE_LOC[IN_LANE][i][j][START_Y])
-                curLane = itref->getLane(IN_LANE, j, i);
+    curLane = lane;
 
     //Set up positions and such
     distanceLeftInLane = curLane->getSize();
     buttLane = curLane;
-    position = curLane->getStart();
     buttPosition = position;
     buttPosition.move(curLane->getDirection(), VEHICLE_SIZE - 1, false);
     buttInLane = 0;
@@ -114,7 +108,7 @@ int Vehicle::getSize() const {
 }
 
 //creates a random vehicle
-Vehicle* Vehicle::generateRandomVehicle(Gridpoint location, const Intersection* itref) {
+Vehicle* Vehicle::generateRandomVehicle(Lane* lane, const Intersection* itref) {
     
     int rng = rand() % 100 + 1;
     int threshhold = 0;
@@ -122,20 +116,20 @@ Vehicle* Vehicle::generateRandomVehicle(Gridpoint location, const Intersection* 
     //car
     threshhold += car_rate;
     if (rng <= threshhold)
-        return new Car(location, itref);
+        return new Car(lane, itref);
     
     //van
     threshhold += van_rate;
     if (rng <= van_rate)
-        return new Van(location, itref);
+        return new Van(lane, itref);
 
     //motercycle
     threshhold += motercycle_rate;
     if (rng <= motercycle_rate)
-        return new Motercycle(location, itref);
+        return new Motercycle(lane, itref);
         
     //truck
-    else return new Truck(location, itref);
+    else return new Truck(lane, itref);
 }
 
 //checks the traffic signal in front of the car
@@ -170,13 +164,13 @@ bool Vehicle::tooFast() const {
 }
 
 //Creates a car
-Car::Car(const Gridpoint& gp, const Intersection* itref) : Vehicle(gp, itref, Vehicle::VCONST[CAR]) {};
+Car::Car(Lane* lane, const Intersection* itref) : Vehicle(lane, itref, Vehicle::VCONST[CAR]) {};
 
 //Creates a van
-Van::Van(const Gridpoint& gp, const Intersection* itref) : Vehicle(gp, itref, Vehicle::VCONST[VAN]) {};
+Van::Van(Lane* lane, const Intersection* itref) : Vehicle(lane, itref, Vehicle::VCONST[VAN]) {};
 
 //Creates a motercycle
-Motercycle::Motercycle(const Gridpoint& gp, const Intersection* itref) : Vehicle(gp, itref, Vehicle::VCONST[MOTERCYCLE]) {};
+Motercycle::Motercycle(Lane* lane, const Intersection* itref) : Vehicle(lane, itref, Vehicle::VCONST[MOTERCYCLE]) {};
 
 //Creates a 12-wheeler truck
-Truck::Truck(const Gridpoint& gp, const Intersection* itref) : Vehicle(gp, itref, Vehicle::VCONST[TRUCK]) {};
+Truck::Truck(Lane* lane, const Intersection* itref) : Vehicle(lane, itref, Vehicle::VCONST[TRUCK]) {};

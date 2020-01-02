@@ -11,10 +11,11 @@ class Grid {
 public:
     Grid();
     bool isOpen(int, int) const;
+    bool isOpen(const Gridpoint&) const;
     void setSpace(const Gridpoint&, bool);
     static Gridpoint drawRoadLine(int, int);
 private:
-    int grid[GRID_SIZE][GRID_SIZE];
+    bool grid[GRID_SIZE][GRID_SIZE];
     static int lineStatus(int, int);
 };
 
@@ -51,7 +52,6 @@ public:
     const Gridpoint& getStart() const;
 private:
     const Gridpoint SPAWNPOINT;
-    std::queue<Vehicle*>* vehicleQueue;
     void spawnVehicle();
 };
 
